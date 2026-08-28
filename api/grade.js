@@ -6,7 +6,11 @@
 // Variables de entorno:
 //   LLM_API_KEY   (obligatoria)  -> Groq: https://console.groq.com/keys  (gratis, sin tarjeta)
 //   LLM_BASE_URL  (opcional)     -> por defecto https://api.groq.com/openai/v1
-//   LLM_MODEL     (opcional)     -> por defecto llama-3.3-70b-versatile
+//   LLM_MODEL     (opcional)     -> por defecto openai/gpt-oss-120b
+//
+// Modelos GRATIS en Groq (tier developer): openai/gpt-oss-120b (mejor calidad),
+//   openai/gpt-oss-20b (más rápido). OJO: los modelos Llama en Groq pasaron a tier
+//   enterprise y ya NO están en el plan gratuito.
 //
 // Otros proveedores (solo cambia las env vars, no el código):
 //   OpenRouter : LLM_BASE_URL=https://openrouter.ai/api/v1        LLM_MODEL=meta-llama/llama-3.3-70b-instruct:free
@@ -89,7 +93,7 @@ export default async function handler(req, res) {
   }
 
   const baseUrl = (process.env.LLM_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
-  const model = process.env.LLM_MODEL || "llama-3.3-70b-versatile";
+  const model = process.env.LLM_MODEL || "openai/gpt-oss-120b";
 
   try {
     const upstream = await fetch(baseUrl + "/chat/completions", {

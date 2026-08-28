@@ -50,9 +50,11 @@ LLM_API_KEY=tu_key_de_groq node dev-server.mjs   # http://localhost:4600
    y `api/grade.js` se despliega como función serverless automáticamente.
 2. En **Settings → Environment Variables** agrega (ver `.env.example`):
    - `LLM_API_KEY` — API key de un proveedor con API estilo OpenAI.
-     [Groq](https://console.groq.com/keys) es gratis y sin tarjeta (corre Llama 3.3 70B).
+     [Groq](https://console.groq.com/keys) es gratis y sin tarjeta.
    - `LLM_BASE_URL` *(opcional)* — por defecto `https://api.groq.com/openai/v1`.
-   - `LLM_MODEL` *(opcional)* — por defecto `llama-3.3-70b-versatile`.
+   - `LLM_MODEL` *(opcional)* — por defecto `openai/gpt-oss-120b` (gratis en Groq;
+     alternativa más rápida `openai/gpt-oss-20b`). Los modelos **Llama en Groq ya no
+     son gratis** (pasaron a tier enterprise).
 3. Redeploy. Los modos con IA quedan activos en la URL de Vercel.
 
 Cambiar de proveedor (OpenRouter, Cerebras, Gemini, Ollama local…) es solo cambiar
