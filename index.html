@@ -1,0 +1,1034 @@
+<meta charset="utf-8">
+<title>Sprint de Entrevista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --bg:#0e1116;
+    --bg-glow:#141b26;
+    --surface:#161c26;
+    --surface-2:#1e2634;
+    --surface-3:#26303f;
+    --ink:#e9eef6;
+    --muted:#93a1b4;
+    --faint:#64717f;
+    --line:rgba(255,255,255,.09);
+    --line-strong:rgba(255,255,255,.16);
+    --accent:#ffb020;
+    --accent-ink:#1a1204;
+    --good:#37d39a;
+    --good-dim:rgba(55,211,154,.14);
+    --bad:#f2585f;
+    --bad-dim:rgba(242,88,95,.14);
+    --t-excel:#3fb27f;
+    --t-apps:#c07cf0;
+    --t-bi:#f2c14e;
+    --t-copilot:#5aa2f2;
+    --t-python:#4bc0d9;
+    --t-sql:#f28f5a;
+    --t-js:#e6d24a;
+    --t-cemex:#7f9cf5;
+    --radius:14px;
+    --shadow:0 18px 44px -20px rgba(0,0,0,.7);
+    --maxw:900px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(900px 500px at 50% -8%, var(--bg-glow), transparent 70%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:20px 18px 72px;
+  }
+
+  h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;margin:0;line-height:1.1;text-wrap:balance}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+  button{font-family:inherit}
+
+  /* ---------- HUD ---------- */
+  .hud{
+    position:sticky;top:0;z-index:20;
+    display:flex;align-items:center;gap:14px;
+    padding:12px 14px;margin:-20px -18px 22px;
+    background:rgba(14,17,22,.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;letter-spacing:.2px}
+  .brand .dot{width:11px;height:11px;border-radius:3px;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+  .hud .lvl{
+    font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.82rem;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;
+    padding:3px 10px;white-space:nowrap;
+  }
+  .xp-track{flex:1;min-width:120px;height:9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+  .xp-fill{height:100%;width:0;background:linear-gradient(90deg,#ffb020,#ff7a2f);transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .hud .stat{font-family:"IBM Plex Mono",monospace;font-size:.82rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .hud .stat b{color:var(--ink)}
+  .icon-btn{
+    background:var(--surface-2);border:1px solid var(--line);color:var(--muted);
+    width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:.95rem;line-height:1;
+    display:grid;place-items:center;
+  }
+  .icon-btn:hover{color:var(--ink);border-color:var(--line-strong)}
+
+  /* ---------- Screens ---------- */
+  .screen{display:none;animation:rise .28s ease}
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){
+    .screen,.xp-fill,*{animation:none!important;transition:none!important}
+  }
+
+  .eyebrow{font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.18em;font-size:.7rem;color:var(--faint)}
+  .lede{color:var(--muted);max-width:60ch}
+
+  /* home */
+  .hero h1{font-size:clamp(1.9rem,6vw,2.9rem);font-weight:800;margin:.3rem 0 .5rem}
+  .hero .accent{color:var(--accent)}
+  .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0 30px}
+  .mode{
+    text-align:left;cursor:pointer;color:var(--ink);
+    background:linear-gradient(180deg,var(--surface-2),var(--surface));
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 15px;transition:transform .15s ease,border-color .15s ease;
+  }
+  .mode:hover{transform:translateY(-3px);border-color:var(--line-strong)}
+  .mode .m-ico{font-size:1.4rem}
+  .mode h3{font-size:1.02rem;margin:8px 0 3px;font-weight:700}
+  .mode p{margin:0;font-size:.82rem;color:var(--muted)}
+  @media (max-width:620px){.modes{grid-template-columns:1fr}}
+
+  .section-label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}
+  .section-label h2{font-size:1.15rem;font-weight:700}
+  .section-label span{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--faint);font-variant-numeric:tabular-nums}
+
+  .topics{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+  @media (max-width:620px){.topics{grid-template-columns:1fr}}
+  .topic{
+    cursor:pointer;text-align:left;color:var(--ink);
+    background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--tc,var(--accent));
+    border-radius:12px;padding:13px 14px;
+    display:flex;flex-direction:column;gap:9px;
+    transition:transform .15s ease,background .15s ease;
+  }
+  .topic:hover{transform:translateY(-2px);background:var(--surface-2)}
+  .topic .t-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .topic .t-name{font-weight:600;font-size:.95rem}
+  .topic .t-count{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--faint);font-variant-numeric:tabular-nums}
+  .bar{height:6px;border-radius:999px;background:var(--surface-3);overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:var(--tc,var(--accent));border-radius:999px;transition:width .5s ease}
+
+  .tips{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 17px}
+  .tips h3{font-size:.95rem;font-weight:700;margin-bottom:8px}
+  .tips ul{margin:0;padding-left:1.1rem;color:var(--muted);font-size:.86rem}
+  .tips li{margin:4px 0}
+  .tips b{color:var(--ink)}
+
+  /* picker */
+  .btn{
+    cursor:pointer;border-radius:11px;padding:11px 18px;font-weight:600;font-size:.92rem;
+    border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);
+    transition:transform .12s ease,background .12s ease;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .btn.ghost{background:transparent;color:var(--muted)}
+  .btn.ghost:hover{color:var(--ink)}
+  .back{margin-bottom:14px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0 24px}
+  .chip{
+    cursor:pointer;border-radius:999px;padding:8px 15px;font-size:.86rem;font-weight:500;
+    background:var(--surface);border:1px solid var(--line);color:var(--ink);
+  }
+  .chip:hover{border-color:var(--line-strong)}
+  .chip[data-tc]{border-left:3px solid var(--tc)}
+
+  /* quiz */
+  .q-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .q-progress{flex:1;height:7px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .q-progress > i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s ease}
+  .lives{font-size:.95rem;letter-spacing:2px;white-space:nowrap}
+  .lives .lost{opacity:.22}
+  .streak{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--accent);white-space:nowrap;font-weight:600}
+  .timer{font-family:"IBM Plex Mono",monospace;font-weight:600;font-variant-numeric:tabular-nums;background:var(--surface-2);border:1px solid var(--line);padding:3px 10px;border-radius:8px;font-size:.82rem}
+  .timer.warn{color:var(--bad);border-color:var(--bad)}
+
+  .card{
+    background:linear-gradient(180deg,var(--surface-2),var(--surface));
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 19px;box-shadow:var(--shadow);
+  }
+  .q-topic{font-family:"IBM Plex Mono",monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.16em;color:var(--faint)}
+  .q-text{font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:1.18rem;margin:8px 0 4px;text-wrap:pretty}
+  pre.code{
+    background:#0b0e13;border:1px solid var(--line);border-radius:10px;
+    padding:12px 13px;margin:14px 0 4px;overflow-x:auto;
+    font-family:"IBM Plex Mono",monospace;font-size:.83rem;color:#d6e2f0;line-height:1.5;
+  }
+  .opts{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+  .opt{
+    text-align:left;cursor:pointer;width:100%;
+    background:var(--surface);border:1px solid var(--line);color:var(--ink);
+    border-radius:11px;padding:12px 14px;font-size:.92rem;
+    display:flex;gap:11px;align-items:flex-start;
+    transition:border-color .12s ease,background .12s ease,transform .12s ease;
+  }
+  .opt:hover:not(:disabled){border-color:var(--line-strong);transform:translateX(2px)}
+  .opt:disabled{cursor:default}
+  .opt .k{
+    font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:600;
+    background:var(--surface-3);border-radius:6px;padding:1px 7px;color:var(--muted);flex-shrink:0;
+  }
+  .opt.correct{border-color:var(--good);background:var(--good-dim)}
+  .opt.correct .k{background:var(--good);color:#062218}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-dim)}
+  .opt.wrong .k{background:var(--bad);color:#2a0709}
+  .opt.dim{opacity:.5}
+
+  .explain{
+    margin-top:15px;border-radius:11px;padding:13px 14px;font-size:.9rem;
+    background:var(--surface-3);border:1px solid var(--line);
+    display:none;
+  }
+  .explain.show{display:block;animation:rise .22s ease}
+  .explain .verdict{font-weight:700;font-family:"Bricolage Grotesque",sans-serif}
+  .explain .verdict.ok{color:var(--good)}
+  .explain .verdict.no{color:var(--bad)}
+  .explain p{margin:5px 0 0;color:var(--muted)}
+  .q-foot{display:flex;justify-content:flex-end;margin-top:16px}
+
+  /* flashcard */
+  .fc{
+    min-height:230px;display:flex;flex-direction:column;justify-content:center;
+    text-align:center;cursor:pointer;user-select:none;
+  }
+  .fc .face-label{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  .fc .face-text{font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:1.15rem;text-wrap:pretty}
+  .fc .face-text.small{font-size:1rem;font-family:"IBM Plex Sans",sans-serif;color:var(--muted)}
+  .fc-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
+
+  /* results */
+  .result-score{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(2.6rem,12vw,4rem);color:var(--accent);line-height:1}
+  .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:20px 0}
+  @media (max-width:520px){.result-grid{grid-template-columns:1fr 1fr}}
+  .rstat{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:13px 14px}
+  .rstat .rv{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:1.3rem;font-variant-numeric:tabular-nums}
+  .rstat .rl{font-size:.76rem;color:var(--faint);text-transform:uppercase;letter-spacing:.1em}
+  .breakdown{display:flex;flex-direction:column;gap:8px;margin:6px 0 22px}
+  .brow{display:flex;align-items:center;gap:10px;font-size:.85rem}
+  .brow .bn{width:120px;flex-shrink:0;color:var(--muted)}
+  .brow .bbar{flex:1;height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+  .brow .bbar > i{display:block;height:100%;background:var(--tc,var(--accent))}
+  .brow .bv{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--faint);width:44px;text-align:right}
+  .review{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+  .rev-item{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--bad);border-radius:10px;padding:12px 13px}
+  .rev-item .rq{font-weight:600;font-size:.9rem}
+  .rev-item .ra{font-size:.84rem;color:var(--muted);margin-top:5px}
+  .rev-item .ra b{color:var(--good)}
+  .cta-row{display:flex;gap:11px;flex-wrap:wrap;margin-top:8px}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.86rem;
+    padding:9px 18px;border-radius:999px;opacity:0;pointer-events:none;
+    transition:opacity .25s ease,transform .25s ease;z-index:40;font-family:"Bricolage Grotesque",sans-serif;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .foot-note{margin-top:40px;text-align:center;font-size:.76rem;color:var(--faint)}
+</style>
+
+<div class="wrap">
+
+  <div class="hud">
+    <span class="brand"><span class="dot"></span>Sprint de Entrevista</span>
+    <span class="lvl" id="hudLvl">Nv 1</span>
+    <span class="xp-track"><span class="xp-fill" id="hudXp"></span></span>
+    <span class="stat" id="hudXpNum">0 XP</span>
+    <button class="icon-btn" id="muteBtn" title="Silenciar sonido">♪</button>
+    <button class="icon-btn" id="resetBtn" title="Reiniciar progreso">⟲</button>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <section class="screen active" id="s-home">
+    <div class="hero">
+      <p class="eyebrow">Práctica intensiva · entrevista 9:30</p>
+      <h1>Llega listo a la <span class="accent">entrevista técnica</span>.</h1>
+      <p class="lede">Preguntas de conocimiento general sobre Excel, Power Apps, Power BI, Copilot Studio, Python, SQL y JavaScript — más un bloque de CEMEX y preguntas de comportamiento. Responde, gana XP, sube de nivel.</p>
+    </div>
+
+    <div class="modes">
+      <button class="mode" data-go="practice">
+        <div class="m-ico">🎯</div>
+        <h3>Práctica por tema</h3>
+        <p>Elige un mazo y responde con explicación inmediata. 3 vidas por ronda.</p>
+      </button>
+      <button class="mode" data-go="flash">
+        <div class="m-ico">🃏</div>
+        <h3>Flashcards</h3>
+        <p>Repaso rápido pregunta → concepto. Ideal para la última hora.</p>
+      </button>
+      <button class="mode" data-go="mock">
+        <div class="m-ico">⏱️</div>
+        <h3>Entrevista simulada</h3>
+        <p>15 preguntas mezcladas, 10 min, sin pistas. Reporte al final.</p>
+      </button>
+    </div>
+
+    <div class="section-label">
+      <h2>Dominio por tema</h2>
+      <span id="overallProg">0 / 0</span>
+    </div>
+    <div class="topics" id="topicGrid"></div>
+
+    <div class="tips">
+      <h3>Repaso exprés antes de entrar</h3>
+      <ul>
+        <li><b>Measure vs calculated column:</b> la <i>measure</i> se evalúa en el contexto del visual (al vuelo); la columna calculada se calcula fila por fila al cargar el modelo.</li>
+        <li><b>Star schema:</b> una tabla de hechos (fact) central con métricas + tablas de dimensión (fecha, producto, planta) que la filtran.</li>
+        <li><b>SQL — orden real:</b> FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. Por eso no puedes usar un alias del SELECT en el WHERE.</li>
+        <li><b>Python:</b> listas mutables, tuplas inmutables; usa <span class="mono">dict.get(k, default)</span> para evitar KeyError.</li>
+        <li><b>JS:</b> <span class="mono">===</span> compara valor y tipo sin convertir; <span class="mono">map/filter</span> devuelven un arreglo nuevo, no mutan.</li>
+        <li><b>Copilot Studio:</b> plataforma low-code de Power Platform para crear agentes/copilots propios con <i>topics</i>, <i>actions</i> y fuentes de conocimiento (grounding).</li>
+        <li><b>STAR:</b> Situación → Tarea → Acción → Resultado. Cierra siempre con un resultado medible y un aprendizaje.</li>
+      </ul>
+    </div>
+    <p class="foot-note">Tu progreso se guarda solo en este navegador. Mucho éxito. 🚀</p>
+  </section>
+
+  <!-- ================= PICKER ================= -->
+  <section class="screen" id="s-picker">
+    <button class="btn ghost back" data-home>← Inicio</button>
+    <p class="eyebrow" id="pickerKicker">Práctica</p>
+    <h1 id="pickerTitle" style="font-size:1.7rem;font-weight:800;margin:.3rem 0 .2rem">Elige un tema</h1>
+    <p class="lede" id="pickerSub">Cada ronda te da 3 vidas. Falla y pierdes una; llega a cero y termina la ronda.</p>
+    <div class="chips" id="pickerChips"></div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="screen" id="s-quiz">
+    <button class="btn ghost back" data-home>← Salir</button>
+    <div class="q-head">
+      <span class="q-progress"><i id="qProg"></i></span>
+      <span class="streak" id="qStreak"></span>
+      <span class="lives" id="qLives"></span>
+    </div>
+    <div class="card">
+      <div class="q-topic" id="qTopic"></div>
+      <div class="q-text" id="qText"></div>
+      <div id="qCodeWrap"></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="explain" id="qExplain">
+        <span class="verdict" id="qVerdict"></span>
+        <p id="qExplainText"></p>
+      </div>
+      <div class="q-foot" id="qFoot"></div>
+    </div>
+  </section>
+
+  <!-- ================= FLASHCARDS ================= -->
+  <section class="screen" id="s-flash">
+    <button class="btn ghost back" data-home>← Salir</button>
+    <div class="q-head">
+      <span class="q-progress"><i id="fcProg"></i></span>
+      <span class="stat mono" id="fcCount" style="color:var(--faint);font-size:.8rem"></span>
+    </div>
+    <div class="card fc" id="fcCard">
+      <div class="face-label" id="fcLabel">Pregunta</div>
+      <div class="face-text" id="fcText"></div>
+      <div id="fcCodeWrap"></div>
+    </div>
+    <div class="fc-actions" id="fcActions"></div>
+  </section>
+
+  <!-- ================= RESULTS ================= -->
+  <section class="screen" id="s-result">
+    <p class="eyebrow" id="rKicker">Resultado</p>
+    <div class="result-score" id="rScore"></div>
+    <p class="lede" id="rMsg"></p>
+    <div class="result-grid" id="rGrid"></div>
+    <div id="rBreakdownWrap" style="display:none">
+      <div class="section-label"><h2>Por tema</h2><span></span></div>
+      <div class="breakdown" id="rBreakdown"></div>
+    </div>
+    <div id="rReviewWrap" style="display:none">
+      <div class="section-label"><h2>Para repasar</h2><span id="rReviewCount"></span></div>
+      <div class="review" id="rReview"></div>
+    </div>
+    <div class="cta-row" style="margin-top:22px">
+      <button class="btn primary" id="rAgain">Otra ronda</button>
+      <button class="btn" data-home>Inicio</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CONTENIDO
+   Cada pregunta: { q, code?, opts:[...], a: índice correcto, ex }
+   ============================================================ */
+const TOPICS = [
+  { id:"excel", name:"Excel", color:"var(--t-excel)", qs:[
+    { q:"¿Qué ventaja tiene XLOOKUP sobre VLOOKUP?", opts:["Es más rápido de escribir pero hace lo mismo","Puede buscar a la izquierda y no depende del número de columna","Solo funciona con tablas dinámicas","Requiere ordenar los datos primero"], a:1, ex:"XLOOKUP busca en cualquier dirección, devuelve por referencia de rango (no por índice de columna) y tiene argumento 'si no se encuentra' integrado." },
+    { q:"¿Para qué sirve la combinación INDEX + MATCH?", opts:["Sumar un rango con condición","Buscar un valor devolviendo una celda ubicada por fila/columna, con más flexibilidad que VLOOKUP","Crear un gráfico dinámico","Quitar duplicados de una columna"], a:1, ex:"MATCH encuentra la posición del valor y INDEX devuelve el contenido de esa posición; permite búsquedas a la izquierda y no se rompe al insertar columnas." },
+    { q:"En SUMIFS, ¿cuál es el orden correcto de argumentos?", code:"=SUMIFS( ? , ? , ? )", opts:["rango_criterio, criterio, rango_suma","rango_suma, rango_criterio1, criterio1","criterio, rango_suma, rango_criterio","rango_suma, criterio1, rango_criterio1"], a:1, ex:"SUMIFS empieza por el rango a sumar y luego pares de (rango_criterio, criterio). SUMIF, en cambio, pone el rango de suma al final." },
+    { q:"¿Qué significa la referencia $A$1?", opts:["Un valor en moneda","Referencia absoluta: no cambia fila ni columna al copiar la fórmula","Referencia a otra hoja","Referencia circular"], a:1, ex:"El signo $ fija la parte que precede. $A$1 fija ambas; A$1 fija solo la fila; $A1 fija solo la columna (referencia mixta)." },
+    { q:"¿Cuál es el propósito principal de una tabla dinámica (PivotTable)?", opts:["Validar entradas de datos","Resumir y agregar grandes volúmenes de datos por categorías sin fórmulas","Proteger celdas con contraseña","Conectarse a una base de datos"], a:1, ex:"Permite agrupar, contar, sumar y promediar arrastrando campos a filas, columnas y valores; es la forma más rápida de explorar datos tabulares." },
+    { q:"¿Qué hace Power Query dentro de Excel?", opts:["Escribe consultas SQL en las celdas","Extrae, transforma y carga datos (limpieza, combinación, tipos) con pasos repetibles","Genera contraseñas","Solo importa archivos CSV"], a:1, ex:"Power Query (Obtener y transformar) es la capa ETL: conecta a fuentes, aplica pasos de limpieza que se pueden refrescar, y carga el resultado a la hoja o al modelo." },
+    { q:"¿Qué devuelve IFERROR(A1/B1, 0) si B1 es 0?", opts:["#¡DIV/0!","0","VERDADERO","Un texto vacío"], a:1, ex:"IFERROR evalúa el primer argumento y, si da cualquier error, devuelve el segundo. Útil para ocultar #N/A o #DIV/0 en reportes." },
+    { q:"¿Cuándo usas COUNTIFS en lugar de COUNTIF?", opts:["Cuando quieres contar celdas vacías","Cuando necesitas contar con varias condiciones a la vez","COUNTIFS no existe","Cuando el rango está en otra hoja"], a:1, ex:"COUNTIF admite una sola condición; COUNTIFS admite múltiples pares rango/criterio que deben cumplirse todos (Y lógico)." },
+    { q:"¿Qué hace TEXTJOIN(\", \", TRUE, A1:A3)?", opts:["Separa un texto en columnas","Une los valores del rango con \", \" como separador, ignorando celdas vacías","Cuenta caracteres","Convierte a mayúsculas"], a:1, ex:"El segundo argumento TRUE indica ignorar vacíos. TEXTJOIN es más flexible que CONCAT porque permite un delimitador y saltar celdas sin dato." },
+    { q:"En una tabla de Excel, ¿qué es una referencia estructurada como Tabla1[Ventas]?", opts:["Un error de sintaxis","Una forma de referirse a la columna 'Ventas' por nombre en vez de por rango de celdas","Una macro","Un gráfico"], a:1, ex:"Las tablas (Ctrl+T) permiten fórmulas legibles que se expanden solas al agregar filas: =SUMA(Tabla1[Ventas]) en lugar de =SUMA(C2:C500)." },
+    { q:"¿Para qué sirve Validación de datos con lista?", opts:["Para crear un menú desplegable que limita lo que se puede capturar en la celda","Para colorear celdas automáticamente","Para bloquear la hoja","Para ordenar de A a Z"], a:0, ex:"Restringe la entrada a valores permitidos, reduce errores de captura y estandariza los datos antes de analizarlos." },
+    { q:"Escribes una fórmula de matriz dinámica y aparece #¡DESBORDAMIENTO! (#SPILL!). ¿Qué pasa?", opts:["La fórmula tiene un error de sintaxis","El rango donde debería 'derramar' los resultados está bloqueado por otro contenido","Falta activar las macros","El archivo está dañado"], a:1, ex:"Las funciones de matriz dinámica (UNIQUE, SORT, FILTER) necesitan celdas vacías para expandirse. Limpia el rango de destino y el resultado se derrama solo." },
+  ]},
+
+  { id:"apps", name:"Power Apps", color:"var(--t-apps)", qs:[
+    { q:"¿Diferencia clave entre una app canvas y una model-driven?", opts:["Canvas no usa datos","Canvas: diseñas la interfaz pixel a pixel libremente. Model-driven: la UI se genera a partir del modelo de datos de Dataverse","Model-driven solo corre en móvil","No hay diferencia"], a:1, ex:"Canvas da control total del diseño y conecta a muchas fuentes. Model-driven es orientada a procesos, dirigida por datos y metadatos de Dataverse." },
+    { q:"Ves la advertencia 'la delegación (delegation) puede no funcionar'. ¿Qué significa?", opts:["La app no tiene licencia","La operación no se puede enviar a la fuente de datos, así que Power Apps solo procesa los primeros N registros localmente","Hay un error de sintaxis en Power Fx","El usuario no tiene permisos"], a:1, ex:"Si una función no es delegable, solo se evalúan ~500–2000 registros traídos al cliente. Con tablas grandes hay que reescribir la fórmula con funciones delegables (Filter con operadores simples, etc.)." },
+    { q:"¿Qué hace la función Patch()?", opts:["Repara la app","Crea o modifica uno o varios registros de una fuente de datos","Cambia de pantalla","Aplica un tema visual"], a:1, ex:"Patch(Origen, Registro, Cambios) actualiza un registro existente; con Defaults(Origen) crea uno nuevo. Es la forma flexible de escribir datos sin un formulario." },
+    { q:"¿Para qué se usa ClearCollect()?", opts:["Borra la app","Vacía una colección y la vuelve a llenar con nuevos registros en memoria","Elimina la fuente de datos","Cierra la sesión"], a:1, ex:"Una colección es una tabla temporal en memoria del dispositivo. ClearCollect(colec, origen) la reinicia y carga datos, útil para cachear o trabajar offline." },
+    { q:"¿Qué control muestra una lista repetida de registros con plantilla personalizable?", opts:["Label","Gallery","Button","Icon"], a:1, ex:"La Gallery repite una plantilla por cada fila de su propiedad Items; se navega con ThisItem y es el bloque básico para listas y tarjetas." },
+    { q:"En Power Fx, ¿qué diferencia hay entre Set() y UpdateContext()?", opts:["Son idénticas","Set() crea una variable global a toda la app; UpdateContext() crea una variable de contexto local a una pantalla","UpdateContext() es global","Set() solo funciona en OnStart"], a:1, ex:"Variables globales (Set) viven en toda la app; las de contexto (UpdateContext) solo en su pantalla. Hay también colecciones para conjuntos de datos." },
+    { q:"El lenguaje de fórmulas de Power Apps (Power Fx) está inspirado principalmente en:", opts:["SQL","Las fórmulas de Excel","Python","JavaScript"], a:1, ex:"Power Fx es declarativo y funcional, con sintaxis y funciones muy parecidas a las de Excel (If, Filter, Sum, Text...), para que sea accesible a usuarios de negocio." },
+    { q:"¿Qué función usas para moverte de la pantalla de inicio a la de detalle?", opts:["GoTo()","Navigate(PantallaDetalle, ScreenTransition.Cover)","OpenScreen()","Redirect()"], a:1, ex:"Navigate(destino, transición, {contexto}) cambia de pantalla y puede pasar variables de contexto. Back() regresa a la anterior." },
+    { q:"En un formulario, ¿qué hace SubmitForm(Form1)?", opts:["Limpia el formulario","Valida y guarda los cambios del formulario en la fuente de datos","Solo cambia a modo edición","Elimina el registro"], a:1, ex:"SubmitForm envía los datos; EditForm/NewForm cambian el modo; ResetForm limpia. Los eventos OnSuccess/OnFailure manejan el resultado." },
+    { q:"Quieres que la app dispare un flujo de aprobación al guardar. ¿Con qué se integra?", opts:["Power BI","Power Automate","SharePoint Designer","Azure DevOps"], a:1, ex:"Power Automate ejecuta flujos (aprobaciones, notificaciones, integraciones). Se llama desde Power Apps con NombreFlujo.Run(parámetros)." },
+    { q:"¿Cuándo se ejecuta la propiedad OnStart de la app?", opts:["Cada vez que se abre cualquier pantalla","Una vez, al iniciar la app (buena para cargar datos y variables globales)","Al cerrar la app","Nunca, está obsoleta"], a:1, ex:"OnStart corre al arrancar; OnVisible corre cada vez que se muestra una pantalla. Evita lógica pesada en OnStart para no retrasar el arranque." },
+    { q:"¿Qué es Dataverse en el contexto de Power Apps?", opts:["Un lenguaje de programación","Una base de datos en la nube segura y estructurada (tablas, relaciones, reglas) para las apps de Power Platform","Un editor de temas","Un conector a Twitter"], a:1, ex:"Dataverse almacena y gestiona datos de negocio con seguridad por roles, lógica de negocio y tipos de columna ricos; es el back-end nativo de las apps model-driven." },
+  ]},
+
+  { id:"bi", name:"Power BI", color:"var(--t-bi)", qs:[
+    { q:"En un modelo estrella, ¿qué contiene la tabla de hechos (fact)?", opts:["Los atributos descriptivos como nombre de producto o ciudad","Las métricas numéricas y las claves foráneas a las dimensiones","Solo fechas","La configuración del reporte"], a:1, ex:"La fact guarda eventos medibles (ventas, toneladas, cantidad) y llaves; las dimensiones (Fecha, Producto, Planta) aportan el contexto para filtrar y agrupar." },
+    { q:"¿Cuándo se evalúa una measure de DAX frente a una columna calculada?", opts:["Ambas al cargar el modelo","La measure al vuelo según el contexto del visual; la columna calculada fila por fila al refrescar","La columna calculada al vuelo; la measure al cargar","Ninguna se recalcula nunca"], a:1, ex:"La columna calculada ocupa espacio y se materializa al refrescar. La measure no ocupa almacenamiento y responde al contexto de filtro de cada celda del visual." },
+    { q:"¿Para qué sirve CALCULATE en DAX?", opts:["Sumar dos columnas","Evaluar una expresión modificando el contexto de filtro","Crear una relación","Cambiar el idioma del reporte"], a:1, ex:"CALCULATE(expresión, filtros...) es la función central de DAX: aplica, quita o reemplaza filtros. Ej: CALCULATE([Ventas], Producto[Tipo]=\"Cemento\")." },
+    { q:"¿Qué hace SUMX(Ventas, Ventas[Cant] * Ventas[Precio])?", opts:["Suma la columna Cant","Itera fila por fila multiplicando Cant × Precio y suma los resultados","Cuenta las filas","Devuelve el promedio de Precio"], a:1, ex:"SUMX es un iterador: recorre la tabla, evalúa la expresión en cada fila (row context) y suma. Necesario cuando el cálculo depende de varias columnas por fila." },
+    { q:"En una relación uno-a-muchos entre Fecha (1) y Ventas (*), ¿en qué dirección fluye el filtro por defecto?", opts:["De Ventas hacia Fecha","De Fecha (uno) hacia Ventas (muchos)","En ambas direcciones siempre","No hay filtrado"], a:1, ex:"El filtro cruzado predeterminado va del lado 'uno' al lado 'muchos'. Filtrar por un mes en la dimensión Fecha reduce las filas visibles de Ventas." },
+    { q:"¿Qué función DAX trae un valor de la tabla del lado 'uno' hacia una columna de la tabla del lado 'muchos'?", opts:["LOOKUPVALUE únicamente","RELATED","MERGE","JOIN"], a:1, ex:"RELATED sigue una relación existente desde el lado 'muchos' para traer una columna de la dimensión. En sentido inverso se usa RELATEDTABLE." },
+    { q:"Necesitas dividir 'Nombre completo' en nombre y apellido de forma repetible al refrescar. ¿Dónde lo haces?", opts:["En DAX con una measure","En Power Query, antes de cargar al modelo","En el visual, con formato condicional","No se puede"], a:1, ex:"Regla práctica: transforma la forma de los datos en Power Query (columnas, tipos, limpieza) y reserva DAX para cálculos analíticos sobre el modelo ya limpio." },
+    { q:"¿Diferencia entre modo Import y DirectQuery?", opts:["Import copia los datos a un modelo en memoria comprimido; DirectQuery consulta la fuente en tiempo real sin almacenarlos","Son lo mismo con distinto nombre","DirectQuery es más rápido siempre","Import no permite refrescar"], a:0, ex:"Import es más rápido y con todo DAX disponible, pero con datos a fecha del último refresh. DirectQuery da datos frescos y maneja volúmenes enormes, a costa de rendimiento y algunas limitaciones." },
+    { q:"¿Qué es el 'row context' en DAX?", opts:["El filtro que aplica un slicer","La noción de 'la fila actual' cuando se itera una tabla (columnas calculadas, funciones X)","El tema de color del reporte","Una relación bidireccional"], a:1, ex:"Row context = fila actual; filter context = conjunto de filtros activos. CALCULATE puede convertir row context en filter context (context transition)." },
+    { q:"Un slicer y un filtro de panel, ¿en qué se diferencian sobre todo?", opts:["El slicer es un objeto visual en el lienzo que el usuario final manipula; el filtro de panel vive en el panel Filtros","El filtro de panel es más rápido","El slicer no afecta a los datos","Son incompatibles"], a:0, ex:"Ambos filtran, pero el slicer es parte del reporte y visible/interactivo para quien lo consume; los filtros de panel los configura el autor." },
+    { q:"¿Qué visual es el más adecuado para mostrar la evolución de un KPI mes a mes?", opts:["Gráfico de pastel","Gráfico de líneas","Tarjeta (card)","Mapa"], a:1, ex:"Las líneas comunican tendencia en el tiempo. El pastel sirve (con pocas categorías) para parte-de-un-todo, no para series temporales." },
+    { q:"Tienes que analizar ventas por 'fecha de pedido' y por 'fecha de envío' usando una sola tabla Fecha. ¿Cómo?", opts:["Duplicar la tabla Fecha","Crear dos relaciones a Fecha (una activa, una inactiva) y activar la inactiva con USERELATIONSHIP dentro de CALCULATE","No es posible con una sola tabla","Usar RELATED dos veces"], a:1, ex:"Es una 'role-playing dimension'. Solo una relación puede estar activa; USERELATIONSHIP(Ventas[FechaEnvio], Fecha[Fecha]) activa la otra para un cálculo puntual." },
+  ]},
+
+  { id:"copilot", name:"Copilot Studio", color:"var(--t-copilot)", qs:[
+    { q:"¿Qué es Copilot Studio?", opts:["Un IDE para C#","Una herramienta low-code de Power Platform para crear agentes/copilots conversacionales personalizados","Un modelo de lenguaje propio de tu empresa","Un cliente de correo"], a:1, ex:"Copilot Studio (antes Power Virtual Agents) permite construir, probar y publicar copilots con lógica de conversación, conexión a datos y acciones, sin escribir código." },
+    { q:"En Copilot Studio, ¿qué es un 'topic'?", opts:["Un color del tema visual","Una unidad de conversación con frases desencadenantes (trigger phrases) y un flujo de nodos que responde a una intención","Un permiso de usuario","Una tabla de Dataverse"], a:1, ex:"Cada topic maneja una intención (p. ej. 'consultar estatus de pedido'): se activa por trigger phrases y ejecuta preguntas, condiciones y respuestas." },
+    { q:"¿Qué permiten las 'actions' (o plugins) en un copilot?", opts:["Cambiar el idioma","Ejecutar operaciones externas: llamar un flujo de Power Automate, una API o un conector para traer o enviar datos","Editar el código fuente del modelo","Nada, son decorativas"], a:1, ex:"Las actions conectan la conversación con sistemas reales: crear un ticket, consultar inventario, etc. Suelen apoyarse en Power Automate o conectores." },
+    { q:"¿Qué es el 'grounding' o fuentes de conocimiento de un copilot?", opts:["El hosting del bot","Documentos y orígenes (SharePoint, sitios web públicos, Dataverse, archivos) que el copilot usa para generar respuestas basadas en tu información","Las pruebas unitarias","El registro de errores"], a:1, ex:"Grounding conecta el modelo generativo a tu contenido para que responda con datos de la organización en lugar de solo conocimiento general, reduciendo alucinaciones." },
+    { q:"¿Para qué sirven las 'trigger phrases' de un topic?", opts:["Para dar formato al texto","Son ejemplos de cómo el usuario podría expresar la intención; el modelo las usa para decidir qué topic activar","Para traducir el bot","Para limitar el número de usuarios"], a:1, ex:"No hace falta listar todas las variantes: el motor de comprensión del lenguaje generaliza a partir de unos cuantos ejemplos representativos." },
+    { q:"'Generative answers' en Copilot Studio se refiere a:", opts:["Respuestas escritas manualmente nodo por nodo","Respuestas que el copilot genera al vuelo a partir de las fuentes de conocimiento cuando ningún topic autorizado coincide","Un plan de pago","Un tipo de gráfico"], a:1, ex:"Combina topics autorizados (control fino) con respuestas generativas sobre tu contenido (cobertura amplia) para preguntas no previstas." },
+    { q:"¿A qué familia de productos pertenece Copilot Studio?", opts:["Microsoft 365 Office","Power Platform (junto a Power Apps, Power Automate, Power BI, Power Pages)","Azure DevOps","Dynamics GP"], a:1, ex:"Comparte conectores, Dataverse y modelo de gobierno con el resto de Power Platform, lo que facilita integrarlo con apps y flujos existentes." },
+    { q:"Diferencia entre Microsoft Copilot (en M365) y un copilot hecho en Copilot Studio:", opts:["Son el mismo producto","Microsoft Copilot es el asistente listo que ya viene integrado en Word/Excel/Teams; en Copilot Studio construyes asistentes a medida para escenarios específicos","Copilot Studio solo sirve para imágenes","M365 Copilot no usa IA"], a:1, ex:"Uno es un producto terminado y transversal; el otro es la plataforma para crear (o extender) copilots propios adaptados a un proceso de negocio." },
+    { q:"Al escribir instrucciones (prompt) para un copilot, ¿qué práctica ayuda más?", opts:["Ser lo más breve y ambiguo posible","Dar contexto, rol, formato de salida esperado y ejemplos concretos","Usar solo mayúsculas","Evitar dar ejemplos"], a:1, ex:"Un buen prompt especifica quién es el asistente, qué debe hacer, con qué datos y cómo entregar la respuesta. Los ejemplos reducen la variabilidad." },
+    { q:"¿Por dónde se puede publicar un copilot creado en Copilot Studio?", opts:["Solo por correo","En canales como Microsoft Teams, un sitio web, apps móviles o de escritorio","Únicamente dentro de Power BI","No se puede publicar, solo probar"], a:1, ex:"Tras probarlo, se publica a uno o varios canales; Teams y web (widget de chat) son los más comunes en entornos corporativos." },
+    { q:"Sobre privacidad: cuando usas Copilot con datos de tu organización...", opts:["Tus datos entrenan el modelo base de OpenAI","Los datos permanecen dentro del límite de cumplimiento del tenant y no se usan para entrenar los modelos de base","Se publican en internet","Se borran al cerrar sesión"], a:1, ex:"Microsoft indica que los prompts, respuestas y datos accedidos vía Graph no se usan para entrenar los foundation models y respetan permisos y residencia de datos." },
+    { q:"Copilot dentro de Excel puede ayudarte a:", opts:["Solo cambiar colores","Sugerir fórmulas, generar tablas y gráficos, y explicar o resumir datos en lenguaje natural","Instalar complementos","Enviar correos"], a:1, ex:"Interpreta una petición en lenguaje natural sobre un rango o tabla y propone fórmulas, análisis, formato condicional o visualizaciones." },
+  ]},
+
+  { id:"python", name:"Python", color:"var(--t-python)", qs:[
+    { q:"¿Diferencia fundamental entre una lista y una tupla?", opts:["La lista guarda números y la tupla texto","La lista es mutable (se puede modificar); la tupla es inmutable","La tupla puede tener más elementos","No hay diferencia"], a:1, ex:"list = [1,2,3] permite append/reasignar elementos; tuple = (1,2,3) no. Las tuplas sirven como claves de diccionario o para datos que no deben cambiar." },
+    { q:"¿Qué imprime este código?", code:"d = {\"a\": 1}\nprint(d.get(\"b\", 0))", opts:["KeyError","None","0","b"], a:2, ex:"dict.get(clave, valor_por_defecto) devuelve el valor por defecto si la clave no existe, en lugar de lanzar KeyError como haría d[\"b\"]." },
+    { q:"¿Qué produce?", code:"print([x*x for x in range(4)])", opts:["[1, 4, 9, 16]","[0, 1, 4, 9]","[0, 1, 2, 3]","[1, 2, 3, 4]"], a:1, ex:"range(4) genera 0,1,2,3. La list comprehension eleva cada uno al cuadrado: 0, 1, 4, 9." },
+    { q:"Con s = \"analitica\", ¿qué devuelve s[1:4]?", code:"s = \"analitica\"\nprint(s[1:4])", opts:["\"anal\"","\"nal\"","\"nali\"","\"ana\""], a:1, ex:"El slice [1:4] toma desde el índice 1 hasta el 3 (el 4 no se incluye): caracteres 'n','a','l'." },
+    { q:"¿Diferencia entre == e is en Python?", opts:["Son idénticos","== compara si los valores son iguales; is compara si son el mismo objeto en memoria","is compara valores","== compara tipos"], a:1, ex:"Usa == para comparar contenido. is solo para identidad, típicamente 'x is None'. Dos listas con el mismo contenido son == pero no is." },
+    { q:"¿Qué imprime?", code:"nombre = \"Ana\"\nedad = 25\nprint(f\"{nombre} tiene {edad} anios\")", opts:["{nombre} tiene {edad} anios","Ana tiene 25 anios","Error de sintaxis","Ana tiene edad anios"], a:1, ex:"Un f-string (prefijo f) interpola expresiones entre llaves con el valor de las variables en el momento de ejecutarse." },
+    { q:"En pandas, pd.read_csv(\"datos.csv\") devuelve:", opts:["Una lista de strings","Un DataFrame (tabla con filas y columnas etiquetadas)","Un diccionario","Un número"], a:1, ex:"El DataFrame es la estructura central de pandas. df.head() muestra las primeras filas y df.info() los tipos y nulos por columna." },
+    { q:"¿Qué imprime?", code:"total = 0\nfor i in range(1, 4):\n    total += i\nprint(total)", opts:["3","6","10","4"], a:1, ex:"range(1,4) recorre 1, 2, 3. La suma acumulada es 1+2+3 = 6." },
+    { q:"¿Qué pasa si intentas s = \"hola\"; s[0] = \"H\"?", opts:["s se vuelve \"Hola\"","Lanza TypeError: los strings son inmutables","Devuelve None","Se ignora silenciosamente"], a:1, ex:"No se puede modificar un carácter in situ. Hay que crear un nuevo string: s = \"H\" + s[1:] o s.replace(...)." },
+    { q:"¿Para qué sirve un bloque try / except?", opts:["Para acelerar el código","Para capturar y manejar errores en tiempo de ejecución sin que el programa se detenga","Para declarar variables","Para importar módulos"], a:1, ex:"El código de try se ejecuta; si lanza una excepción del tipo indicado en except, se maneja ahí. finally corre siempre (limpieza)." },
+    { q:"¿Qué imprime?", code:"print([1, 2, 3, 4][::-1])", opts:["[1, 2, 3, 4]","[4, 3, 2, 1]","[4, 1]","Error"], a:1, ex:"El slice [::-1] recorre la secuencia con paso -1, devolviendo una copia invertida." },
+    { q:"¿Qué devuelve len({\"a\": 1, \"b\": 2, \"c\": 3})?", opts:["6","3","1","Error"], a:1, ex:"len() sobre un diccionario devuelve el número de pares clave-valor, en este caso 3." },
+  ]},
+
+  { id:"sql", name:"SQL", color:"var(--t-sql)", qs:[
+    { q:"¿Diferencia entre INNER JOIN y LEFT JOIN?", opts:["INNER JOIN es más rápido siempre","INNER JOIN devuelve solo filas con coincidencia en ambas tablas; LEFT JOIN devuelve todas las de la izquierda y NULL donde no hay coincidencia","LEFT JOIN elimina duplicados","Son sinónimos"], a:1, ex:"Si necesitas conservar clientes sin pedidos (y ver NULL en las columnas de pedidos), usas LEFT JOIN; si solo quieres clientes con pedidos, INNER JOIN." },
+    { q:"¿Cuál es la diferencia entre WHERE y HAVING?", opts:["No hay diferencia","WHERE filtra filas antes de agrupar; HAVING filtra grupos después de GROUP BY (puede usar agregados)","HAVING va antes que WHERE","WHERE solo funciona con números"], a:1, ex:"WHERE cantidad > 0 filtra registros individuales; HAVING SUM(cantidad) > 100 filtra grupos ya agregados. No puedes usar SUM() en WHERE." },
+    { q:"¿Qué hace esta consulta?", code:"SELECT planta, SUM(toneladas)\nFROM produccion\nGROUP BY planta;", opts:["Suma todas las toneladas en un solo número","Devuelve el total de toneladas por cada planta","Cuenta las plantas","Ordena por toneladas"], a:1, ex:"GROUP BY colapsa las filas de cada planta en una y el agregado SUM se calcula por grupo. Cada columna del SELECT no agregada debe estar en el GROUP BY." },
+    { q:"¿Diferencia entre COUNT(*) y COUNT(columna)?", opts:["Son iguales","COUNT(*) cuenta todas las filas; COUNT(columna) cuenta solo las filas donde esa columna NO es NULL","COUNT(columna) es más rápido","COUNT(*) ignora duplicados"], a:1, ex:"Por eso COUNT(*) y COUNT(email) pueden dar números distintos si hay emails nulos. COUNT(DISTINCT columna) cuenta valores únicos no nulos." },
+    { q:"¿Qué hace SELECT DISTINCT ciudad FROM clientes?", opts:["Ordena las ciudades","Devuelve la lista de ciudades sin repeticiones","Cuenta las ciudades","Borra ciudades duplicadas de la tabla"], a:1, ex:"DISTINCT elimina filas duplicadas del resultado (no modifica la tabla). Con varias columnas, considera única la combinación completa." },
+    { q:"Sin cláusula ASC/DESC, ORDER BY fecha ordena de forma:", opts:["Descendente (más reciente primero)","Ascendente (más antiguo primero)","Aleatoria","No ordena"], a:1, ex:"ASC es el valor por defecto. Para lo más reciente primero hay que escribir ORDER BY fecha DESC explícitamente." },
+    { q:"¿Qué devuelve?", code:"SELECT nombre FROM productos\nWHERE id IN (SELECT producto_id FROM ventas);", opts:["Todos los productos","Solo los productos que aparecen al menos una vez en la tabla ventas","Los productos sin ventas","Un error"], a:1, ex:"La subconsulta produce la lista de IDs vendidos; IN filtra los productos cuyo id está en esa lista. Es una forma de 'productos con ventas'." },
+    { q:"En SELECT c.nombre FROM clientes AS c, ¿qué es 'c'?", opts:["Una función","Un alias de tabla para escribir referencias más cortas","Una columna","Un comentario"], a:1, ex:"Los alias (con o sin AS) acortan nombres de tablas y columnas, y son necesarios cuando una consulta une la misma tabla consigo misma (self-join)." },
+    { q:"¿Cómo se filtran las filas cuyo campo 'telefono' no tiene valor?", opts:["WHERE telefono = NULL","WHERE telefono IS NULL","WHERE telefono = ''","WHERE telefono != 0"], a:1, ex:"NULL no es un valor comparable con =. Hay que usar IS NULL / IS NOT NULL. 'telefono = NULL' nunca es verdadero." },
+    { q:"¿Qué hace ROW_NUMBER() OVER (PARTITION BY planta ORDER BY toneladas DESC)?", opts:["Suma toneladas por planta","Asigna 1, 2, 3... a las filas dentro de cada planta, ordenadas por toneladas de mayor a menor","Cuenta las plantas","Borra duplicados"], a:1, ex:"Las funciones de ventana calculan sobre un conjunto de filas relacionadas sin colapsarlas. Sirve para 'top N por grupo', rankings y comparaciones fila a fila." },
+    { q:"¿Diferencia entre UNION y UNION ALL?", opts:["UNION ALL ordena el resultado","UNION elimina filas duplicadas del resultado combinado; UNION ALL las conserva todas (y es más rápido)","UNION suma columnas","Son iguales"], a:1, ex:"Si sabes que no hay duplicados o los quieres conservar, UNION ALL evita el costo de la deduplicación." },
+    { q:"¿Cuál es el orden lógico real de ejecución de una consulta?", opts:["SELECT → FROM → WHERE → GROUP BY → ORDER BY","FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY","WHERE → FROM → SELECT → GROUP BY","ORDER BY → SELECT → FROM → WHERE"], a:1, ex:"Por eso un alias definido en SELECT no se puede usar en WHERE (aún no existe), pero sí en ORDER BY, que se evalúa al final." },
+  ]},
+
+  { id:"js", name:"JavaScript", color:"var(--t-js)", qs:[
+    { q:"¿Diferencia entre let, const y var?", opts:["Son intercambiables","let y const tienen alcance de bloque; var tiene alcance de función. const además no permite reasignar la variable","const no existe","var es de bloque"], a:1, ex:"En código moderno se usa const por defecto y let cuando hay que reasignar; var se evita por su hoisting y alcance de función confusos." },
+    { q:"¿Qué evalúa como true?", code:"console.log(0 == \"0\", 0 === \"0\");", opts:["true true","false false","true false","false true"], a:2, ex:"== convierte tipos antes de comparar (0 y \"0\" se igualan → true). === compara valor y tipo sin convertir (number vs string → false)." },
+    { q:"¿Qué devuelve [1, 2, 3].map(x => x * 2)?", opts:["6","[1, 2, 3]","[2, 4, 6]","undefined"], a:2, ex:"map crea un arreglo nuevo aplicando la función a cada elemento, sin modificar el original. Su longitud es siempre igual a la del original." },
+    { q:"¿Qué hace Array.prototype.filter?", opts:["Ordena el arreglo","Devuelve un nuevo arreglo con solo los elementos para los que la función devuelve un valor truthy","Suma los elementos","Elimina el primer elemento"], a:1, ex:"[1,2,3,4].filter(n => n % 2 === 0) → [2, 4]. No muta el arreglo original; puede devolver menos elementos (o ninguno)." },
+    { q:"¿Qué imprime?", code:"const r = [1, 2, 3, 4].reduce((acc, n) => acc + n, 0);\nconsole.log(r);", opts:["10","[1,2,3,4]","0","24"], a:0, ex:"reduce acumula un valor recorriendo el arreglo. Empezando en 0: 0+1+2+3+4 = 10. El segundo argumento es el valor inicial del acumulador." },
+    { q:"¿Qué devuelve typeof null?", opts:["\"null\"","\"object\"","\"undefined\"","\"boolean\""], a:1, ex:"Es un bug histórico de JavaScript que se mantiene por compatibilidad. Para detectar null se compara directamente: valor === null." },
+    { q:"Una función async, ¿qué devuelve siempre?", opts:["El valor tal cual","Una Promesa (Promise) que se resuelve con el valor retornado","undefined","Un callback"], a:1, ex:"Por eso se consume con await o .then(). await pausa dentro de la función async hasta que la promesa se resuelve o rechaza." },
+    { q:"¿Es válido este código?", code:"const arr = [1, 2];\narr.push(3);\nconsole.log(arr);", opts:["No, const impide modificar el arreglo → error","Sí, imprime [1, 2, 3]: const impide reasignar la variable, no mutar el contenido","Imprime [1, 2]","Imprime 3"], a:1, ex:"const congela el enlace variable→valor, no el objeto. Puedes mutar el arreglo (push, pop), pero no hacer arr = otroArreglo." },
+    { q:"¿Qué produce la desestructuración const { a, b } = { a: 1, b: 2, c: 3 }?", opts:["a y b quedan undefined","a = 1 y b = 2; c se descarta","Un error","a = {a:1}"], a:1, ex:"La desestructuración extrae propiedades por nombre a variables. Con arreglos es por posición: const [x, y] = [10, 20]." },
+    { q:"¿Qué imprime?", code:"const nombre = \"BI\";\nconsole.log(`Rol: ${nombre.toLowerCase()}`);", opts:["Rol: ${nombre}","Rol: bi","Rol: BI","Error"], a:1, ex:"Los template literals (comillas invertidas) interpolan expresiones dentro de ${ }, y aquí se evalúa el método antes de insertar el resultado." },
+    { q:"map, filter y forEach recorren un arreglo. ¿Cuál NO devuelve un valor útil?", opts:["map","filter","forEach","Todos devuelven un arreglo"], a:2, ex:"forEach devuelve undefined; se usa solo por su efecto secundario (imprimir, acumular fuera). Para transformar y encadenar se usan map/filter." },
+    { q:"¿Qué diferencia hay entre null y undefined?", opts:["Son idénticos","undefined: la variable existe pero no se le asignó valor. null: asignación explícita de 'sin valor'","null causa error al usarse","undefined solo aparece en funciones"], a:1, ex:"undefined suele venir del motor (variable sin inicializar, propiedad inexistente); null lo pone el programador para indicar ausencia intencional." },
+  ]},
+
+  { id:"cemex", name:"CEMEX y entrevista", color:"var(--t-cemex)", qs:[
+    { q:"¿Cuál es el negocio principal de CEMEX?", opts:["Software empresarial","Materiales para la construcción: cemento, concreto premezclado y agregados","Logística de paquetería","Energía eléctrica"], a:1, ex:"CEMEX es una de las mayores empresas globales de materiales de construcción, con origen en Monterrey, México. Conocer su cadena de valor ayuda a conectar tu rol de datos con la operación." },
+    { q:"En la cadena de producción del cemento, ¿qué orden es correcto?", opts:["Concreto → clinker → cantera → cemento","Cantera (extracción) → horno/clinker → molienda a cemento → concreto premezclado","Cemento → cantera → concreto","Clinker → cantera → concreto → cemento"], a:1, ex:"Se extrae piedra caliza, se cuece para formar clinker, se muele con aditivos para obtener cemento y se combina con agua y agregados para el concreto. Los KPIs de operación viven en cada etapa." },
+    { q:"¿Qué caracteriza a un buen KPI para la operación?", opts:["Que sea difícil de calcular","Que sea medible, accionable y esté alineado a un objetivo del negocio","Que use muchos colores en el dashboard","Que cambie de definición cada mes"], a:1, ex:"Un KPI útil responde '¿esto nos acerca al objetivo?' y alguien puede actuar sobre él. Si nadie puede influir en el número o nadie lo revisa, sobra." },
+    { q:"El método STAR para responder preguntas de comportamiento significa:", opts:["Situación, Tarea, Acción, Resultado","Start, Talk, Ask, Repeat","Sistema, Tiempo, Análisis, Reporte","Situación, Táctica, Alcance, Recomendación"], a:0, ex:"Describe brevemente el contexto (S), tu responsabilidad (T), lo que hiciste tú concretamente (A) y el resultado con datos + qué aprendiste (R)." },
+    { q:"Te preguntan por un error que cometiste. ¿Mejor enfoque?", opts:["Decir que nunca cometes errores","Contar uno real, asumir tu parte, explicar cómo lo corregiste y qué cambiaste para que no se repita","Culpar a un compañero","Elegir un error tan pequeño que no cuente"], a:1, ex:"Buscan honestidad y capacidad de aprendizaje, no perfección. El cierre (qué mejoraste) es la parte más importante de la respuesta." },
+    { q:"Al diseñar un dashboard para la operación, ¿qué va primero?", opts:["Las tablas de detalle con todos los registros","El resumen y el estado general (KPIs, semáforos) antes que el detalle","Los filtros avanzados","El logo lo más grande posible"], a:1, ex:"Quien consume el tablero necesita ver de un vistazo qué requiere atención; el detalle se explora después. Codifica el estado con forma y color, no solo con números." },
+    { q:"¿Qué es CEMEX Go?", opts:["Un programa de becas","La plataforma digital para que los clientes hagan pedidos, den seguimiento a entregas y consulten facturas en línea","Un tipo de cemento","Una app de recursos humanos"], a:1, ex:"Es un ejemplo del enfoque de digitalización de CEMEX. Mencionar que conoces sus iniciativas digitales muestra interés genuino en la empresa." },
+    { q:"'La planta con más paros también tuvo más lluvia ese mes, por lo tanto la lluvia causa los paros.' ¿Qué falla?", opts:["Nada, es correcto","Confunde correlación con causalidad: dos variables se mueven juntas pero puede haber un tercer factor o azar","Faltan más colores","El tamaño de muestra es irrelevante"], a:1, ex:"Correlación ≠ causalidad. Antes de afirmar causa hay que controlar otras variables, revisar el mecanismo y, si se puede, comparar con un grupo de control." },
+    { q:"Antes de analizar un conjunto de datos nuevo, ¿qué haces primero?", opts:["Sacar conclusiones de inmediato","Explorar y limpiar: revisar nulos, duplicados, tipos de dato, rangos imposibles y valores atípicos","Crear el reporte final","Borrar las filas con cualquier valor faltante sin revisarlas"], a:1, ex:"El análisis solo es tan bueno como los datos que lo alimentan. Documentar qué se limpió y por qué también da credibilidad al resultado." },
+    { q:"Te preguntan cómo compaginarías la práctica con exámenes y clases. Mejor respuesta:", opts:["Prometer que la escuela nunca interferirá","Explicar cómo planificas, priorizas y comunicas con anticipación los periodos de carga para reorganizar entregas","Decir que dejarías la escuela en segundo plano","Evadir la pregunta"], a:1, ex:"Muestran flexibilidad de horario; quieren ver que eres organizado y que avisas a tiempo, no que sacrificas una cosa por la otra." },
+    { q:"'¿Por qué quieres esta práctica en CEMEX?' Enfoque más sólido:", opts:["Porque necesito el apoyo económico","Conectar tus habilidades (Power BI, SQL, Python) con lo que hace el área, y qué quieres aprender y aportar en esos 6 meses","Porque cualquier práctica me sirve","Porque queda cerca de mi casa"], a:1, ex:"Combina motivación concreta (aprender de la operación, aplicar datos a un negocio industrial real) con lo que tú aportas. Evita razones puramente personales." },
+    { q:"En una entrevista técnica no sabes la respuesta exacta. ¿Qué conviene hacer?", opts:["Inventar una respuesta con seguridad","Decir lo que sí sabes del tema, razonar en voz alta y explicar cómo lo averiguarías","Quedarte callado","Cambiar de tema"], a:1, ex:"Evalúan tu forma de pensar, no solo el dato memorizado. Reconocer el límite y mostrar método de resolución deja mejor impresión que fingir." },
+  ]},
+];
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+const KEY = "sprint-entrevista-v1";
+const DEFAULT_STATE = { xp:0, mastered:{}, seen:{}, bestMock:0, muted:false };
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return structuredClone(DEFAULT_STATE);
+    const p = JSON.parse(raw);
+    return Object.assign(structuredClone(DEFAULT_STATE), p);
+  }catch(e){ return structuredClone(DEFAULT_STATE); }
+}
+function saveState(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+}
+function masteredSet(tid){
+  if(!state.mastered[tid]) state.mastered[tid] = [];
+  return new Set(state.mastered[tid]);
+}
+function markMastered(tid, qi){
+  const s = masteredSet(tid);
+  if(!s.has(qi)){ s.add(qi); state.mastered[tid] = [...s]; }
+}
+
+/* ============================================================
+   NIVELES / XP
+   ============================================================ */
+function levelInfo(xp){
+  let lvl = 1, need = 100, acc = 0;
+  while(xp >= acc + need){ acc += need; lvl++; need = 100 + (lvl-1)*60; }
+  return { lvl, into: xp - acc, need, pct: Math.round(((xp-acc)/need)*100) };
+}
+function addXp(n){
+  const before = levelInfo(state.xp).lvl;
+  state.xp += n;
+  const after = levelInfo(state.xp).lvl;
+  saveState(); renderHud();
+  if(after > before){ toast("¡Nivel " + after + "! ⬆️"); beep(660, .12); }
+}
+
+/* ============================================================
+   SONIDO
+   ============================================================ */
+let actx;
+function beep(freq, dur, type){
+  if(state.muted) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type || "sine"; o.frequency.value = freq;
+    o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(.06, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + dur);
+    o.start(); o.stop(actx.currentTime + dur);
+  }catch(e){}
+}
+const sndOk = ()=>{ beep(523,.09); setTimeout(()=>beep(784,.12),90); };
+const sndNo = ()=>{ beep(180,.18,"square"); };
+
+/* ============================================================
+   UTIL
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function topicById(id){ return TOPICS.find(t=>t.id===id); }
+function esc(s){ return s.replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+let toastTimer;
+function toast(msg){
+  const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove("show"), 1600);
+}
+
+function show(id){
+  $$(".screen").forEach(s=>s.classList.remove("active"));
+  $("#"+id).classList.add("active");
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+/* ============================================================
+   HUD + HOME
+   ============================================================ */
+function renderHud(){
+  const li = levelInfo(state.xp);
+  $("#hudLvl").textContent = "Nv " + li.lvl;
+  $("#hudXp").style.width = li.pct + "%";
+  $("#hudXpNum").textContent = state.xp + " XP";
+  $("#muteBtn").textContent = state.muted ? "🔇" : "♪";
+}
+
+function renderHome(){
+  const grid = $("#topicGrid");
+  grid.innerHTML = "";
+  let totMastered = 0, totQ = 0;
+  TOPICS.forEach(t=>{
+    const m = masteredSet(t.id).size;
+    const n = t.qs.length;
+    totMastered += Math.min(m,n); totQ += n;
+    const pct = Math.round((Math.min(m,n)/n)*100);
+    const b = document.createElement("button");
+    b.className = "topic";
+    b.style.setProperty("--tc", t.color);
+    b.innerHTML = `
+      <div class="t-top">
+        <span class="t-name">${t.name}</span>
+        <span class="t-count">${Math.min(m,n)}/${n}</span>
+      </div>
+      <div class="bar"><i style="width:${pct}%"></i></div>`;
+    b.addEventListener("click", ()=>startPractice(t.id));
+    grid.appendChild(b);
+  });
+  $("#overallProg").textContent = totMastered + " / " + totQ + " dominadas";
+}
+
+/* ============================================================
+   PRÁCTICA / QUIZ
+   ============================================================ */
+let quiz = null;
+
+function openPicker(mode){
+  show("s-picker");
+  const chips = $("#pickerChips");
+  chips.innerHTML = "";
+  if(mode === "practice"){
+    $("#pickerKicker").textContent = "Práctica por tema";
+    $("#pickerTitle").textContent = "Elige un tema";
+    $("#pickerSub").textContent = "Cada ronda te da 3 vidas. Falla y pierdes una; llega a cero y termina la ronda.";
+    TOPICS.forEach(t=>{
+      const c = document.createElement("button");
+      c.className = "chip"; c.style.setProperty("--tc", t.color);
+      c.dataset.tc = "1";
+      c.textContent = t.name;
+      c.addEventListener("click", ()=>startPractice(t.id));
+      chips.appendChild(c);
+    });
+  } else if(mode === "flash"){
+    $("#pickerKicker").textContent = "Flashcards";
+    $("#pickerTitle").textContent = "¿Qué quieres repasar?";
+    $("#pickerSub").textContent = "Mira la pregunta, intenta responder mentalmente y voltea la tarjeta.";
+    const all = document.createElement("button");
+    all.className = "chip"; all.textContent = "Todos los temas";
+    all.addEventListener("click", ()=>startFlash("all"));
+    chips.appendChild(all);
+    TOPICS.forEach(t=>{
+      const c = document.createElement("button");
+      c.className = "chip"; c.style.setProperty("--tc", t.color); c.dataset.tc = "1";
+      c.textContent = t.name;
+      c.addEventListener("click", ()=>startFlash(t.id));
+      chips.appendChild(c);
+    });
+  }
+}
+
+function startPractice(tid){
+  const t = topicById(tid);
+  quiz = {
+    mode:"practice", tid,
+    items: shuffle(t.qs.map((q,i)=>({q, qi:i}))),
+    idx:0, lives:3, streak:0, correct:0, answered:false, wrongList:[]
+  };
+  show("s-quiz");
+  renderQuestion();
+}
+
+function startMock(){
+  const pool = [];
+  TOPICS.forEach(t=> t.qs.forEach((q,i)=> pool.push({q, qi:i, tid:t.id, tname:t.name, color:t.color})));
+  quiz = {
+    mode:"mock",
+    items: shuffle(pool).slice(0,15),
+    idx:0, correct:0, answered:false, selected:null,
+    perTopic:{}, wrongList:[], startTs:Date.now(),
+    timeLeft: 10*60
+  };
+  show("s-quiz");
+  quiz.timer = setInterval(tickMock, 1000);
+  renderQuestion();
+}
+function tickMock(){
+  quiz.timeLeft--;
+  updateTimerUI();
+  if(quiz.timeLeft <= 0){ clearInterval(quiz.timer); finishQuiz(); }
+}
+function updateTimerUI(){
+  const el = $("#qStreak");
+  const m = Math.floor(quiz.timeLeft/60), s = quiz.timeLeft%60;
+  el.className = "timer" + (quiz.timeLeft <= 60 ? " warn" : "");
+  el.textContent = m + ":" + String(s).padStart(2,"0");
+}
+
+function renderQuestion(){
+  const it = quiz.items[quiz.idx];
+  const q = it.q;
+  quiz.answered = false; quiz.selected = null;
+
+  // progress
+  $("#qProg").style.width = ((quiz.idx)/quiz.items.length*100) + "%";
+
+  // header widgets
+  if(quiz.mode === "practice"){
+    $("#qLives").style.display = "";
+    $("#qLives").innerHTML = [0,1,2].map(i=>`<span class="${i<quiz.lives?'':'lost'}">❤️</span>`).join("");
+    $("#qStreak").className = "streak";
+    $("#qStreak").textContent = quiz.streak >= 2 ? ("racha ×" + quiz.streak + " 🔥") : "";
+  } else {
+    $("#qLives").style.display = "none";
+    updateTimerUI();
+  }
+
+  // topic label
+  const tname = quiz.mode === "mock" ? it.tname : topicById(quiz.tid).name;
+  $("#qTopic").textContent = tname + "  ·  " + (quiz.idx+1) + "/" + quiz.items.length;
+
+  $("#qText").textContent = q.q;
+
+  const cw = $("#qCodeWrap"); cw.innerHTML = "";
+  if(q.code){
+    const pre = document.createElement("pre");
+    pre.className = "code"; pre.textContent = q.code;
+    cw.appendChild(pre);
+  }
+
+  // options
+  const optWrap = $("#qOpts"); optWrap.innerHTML = "";
+  const order = shuffle(q.opts.map((text,i)=>({text, correct:i===q.a})));
+  quiz._order = order;
+  order.forEach((o,i)=>{
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<span class="k">${String.fromCharCode(65+i)}</span><span>${esc(o.text)}</span>`;
+    b.addEventListener("click", ()=>choose(i));
+    optWrap.appendChild(b);
+  });
+
+  $("#qExplain").className = "explain";
+  $("#qFoot").innerHTML = "";
+}
+
+function choose(i){
+  if(quiz.answered) return;
+  quiz.answered = true;
+  const order = quiz._order;
+  const btns = $$("#qOpts .opt");
+  const isCorrect = order[i].correct;
+  const it = quiz.items[quiz.idx];
+
+  btns.forEach((b,bi)=>{
+    b.disabled = true;
+    if(order[bi].correct) b.classList.add("correct");
+    else if(bi===i) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+
+  if(quiz.mode === "practice"){
+    const ex = $("#qExplain");
+    ex.className = "explain show";
+    $("#qVerdict").className = "verdict " + (isCorrect ? "ok" : "no");
+    $("#qVerdict").textContent = isCorrect ? "Correcto" : "Incorrecto";
+    $("#qExplainText").textContent = it.q.ex;
+
+    if(isCorrect){
+      quiz.correct++; quiz.streak++;
+      quiz._maxStreak = Math.max(quiz._maxStreak||0, quiz.streak);
+      markMastered(quiz.tid, it.qi);
+      const gain = 10 + Math.min(quiz.streak-1, 5) * 2;
+      addXp(gain);
+      sndOk();
+    } else {
+      quiz.streak = 0; quiz.lives--;
+      quiz.wrongList.push(it);
+      sndNo();
+    }
+    bumpSeen(quiz.tid, isCorrect);
+    $("#qLives").innerHTML = [0,1,2].map(k=>`<span class="${k<quiz.lives?'':'lost'}">❤️</span>`).join("");
+    $("#qStreak").textContent = quiz.streak >= 2 ? ("racha ×" + quiz.streak + " 🔥") : "";
+
+    const foot = $("#qFoot");
+    const nb = document.createElement("button");
+    nb.className = "btn primary";
+    const last = quiz.idx >= quiz.items.length - 1 || quiz.lives <= 0;
+    nb.textContent = last ? "Ver resultado" : "Siguiente →";
+    nb.addEventListener("click", advance);
+    foot.appendChild(nb);
+  } else {
+    // mock: no feedback, auto-advance
+    if(isCorrect){
+      quiz.correct++;
+      quiz.perTopic[it.tid] = quiz.perTopic[it.tid] || {c:0,n:0};
+      quiz.perTopic[it.tid].c++;
+    } else {
+      quiz.wrongList.push(it);
+    }
+    quiz.perTopic[it.tid] = quiz.perTopic[it.tid] || {c:0,n:0};
+    quiz.perTopic[it.tid].n++;
+    setTimeout(advance, 260);
+  }
+}
+
+function bumpSeen(tid, ok){
+  state.seen[tid] = state.seen[tid] || {seen:0, correct:0};
+  state.seen[tid].seen++;
+  if(ok) state.seen[tid].correct++;
+  saveState();
+}
+
+function advance(){
+  if(quiz.mode === "practice" && quiz.lives <= 0){ finishQuiz(); return; }
+  quiz.idx++;
+  if(quiz.idx >= quiz.items.length){ finishQuiz(); return; }
+  renderQuestion();
+}
+
+/* ============================================================
+   FLASHCARDS
+   ============================================================ */
+let fc = null;
+function startFlash(scope){
+  let items = [];
+  if(scope === "all"){
+    TOPICS.forEach(t=> t.qs.forEach((q,i)=> items.push({q, qi:i, tid:t.id})));
+  } else {
+    topicById(scope).qs.forEach((q,i)=> items.push({q, qi:i, tid:scope}));
+  }
+  fc = { items: shuffle(items), idx:0, flipped:false, knew:0, scope };
+  show("s-flash");
+  renderFc();
+}
+function renderFc(){
+  const it = fc.items[fc.idx];
+  fc.flipped = false;
+  $("#fcProg").style.width = (fc.idx/fc.items.length*100) + "%";
+  $("#fcCount").textContent = (fc.idx+1) + " / " + fc.items.length;
+  $("#fcLabel").textContent = topicById(it.tid).name + "  ·  pregunta";
+  $("#fcText").className = "face-text";
+  $("#fcText").textContent = it.q.q;
+  const cw = $("#fcCodeWrap"); cw.innerHTML = "";
+  if(it.q.code){
+    const pre = document.createElement("pre"); pre.className = "code"; pre.textContent = it.q.code;
+    cw.appendChild(pre);
+  }
+  const act = $("#fcActions"); act.innerHTML = "";
+  const flipBtn = document.createElement("button");
+  flipBtn.className = "btn primary"; flipBtn.textContent = "Voltear";
+  flipBtn.addEventListener("click", flipFc);
+  act.appendChild(flipBtn);
+}
+function flipFc(){
+  const it = fc.items[fc.idx];
+  if(!fc.flipped){
+    fc.flipped = true;
+    $("#fcLabel").textContent = "respuesta";
+    const correct = it.q.opts[it.q.a];
+    $("#fcCodeWrap").innerHTML = "";
+    $("#fcText").className = "face-text";
+    $("#fcText").innerHTML = `<span style="color:var(--good)">${esc(correct)}</span><br><span class="face-text small" style="display:inline-block;margin-top:10px">${esc(it.q.ex)}</span>`;
+    const act = $("#fcActions"); act.innerHTML = "";
+    const no = document.createElement("button");
+    no.className = "btn"; no.textContent = "Repasar";
+    no.addEventListener("click", ()=>nextFc(false));
+    const yes = document.createElement("button");
+    yes.className = "btn primary"; yes.textContent = "La sabía";
+    yes.addEventListener("click", ()=>nextFc(true));
+    act.appendChild(no); act.appendChild(yes);
+  }
+}
+function nextFc(knew){
+  const it = fc.items[fc.idx];
+  if(knew){ fc.knew++; markMastered(it.tid, it.qi); addXp(4); }
+  fc.idx++;
+  if(fc.idx >= fc.items.length){
+    saveState();
+    showResult({
+      kicker:"Flashcards", scoreText: fc.knew + "/" + fc.items.length,
+      msg: fc.knew === fc.items.length ? "Impecable. Tienes el material fresco." : "Vuelve a correr las que marcaste como 'Repasar' hasta que fluyan.",
+      grid:[["Tarjetas", fc.items.length],["\"La sabía\"", fc.knew],["XP ganada", fc.knew*4]],
+      againLabel:"Repasar de nuevo", again:()=>startFlash(fc.scope)
+    });
+    return;
+  }
+  renderFc();
+}
+
+/* ============================================================
+   RESULTADOS
+   ============================================================ */
+function finishQuiz(){
+  if(quiz.timer) clearInterval(quiz.timer);
+
+  if(quiz.mode === "practice"){
+    const done = quiz.idx + (quiz.answered ? 1 : 0);
+    const total = quiz.items.length;
+    const survived = quiz.lives > 0;
+    showResult({
+      kicker: topicById(quiz.tid).name + " · práctica",
+      scoreText: quiz.correct + "/" + total,
+      msg: survived
+        ? (quiz.correct === total ? "Ronda perfecta. Ese tema lo tienes." : "Buen avance. Repite para dominar las que fallaste.")
+        : "Te quedaste sin vidas. Respira y vuelve a intentarlo — es práctica, para eso es.",
+      grid:[
+        ["Aciertos", quiz.correct + "/" + total],
+        ["Vidas restantes", quiz.lives],
+        ["Racha máx.", quiz._maxStreak || quiz.streak]
+      ],
+      wrong: quiz.wrongList,
+      againLabel:"Repetir tema", again:()=>startPractice(quiz.tid)
+    });
+  } else {
+    const used = 10*60 - quiz.timeLeft;
+    const mm = Math.floor(used/60), ss = used%60;
+    const pct = Math.round(quiz.correct/quiz.items.length*100);
+    const isBest = pct > (state.bestMock||0);
+    if(isBest){ state.bestMock = pct; }
+    addXp(quiz.correct * 5);
+    saveState();
+
+    const breakdown = TOPICS.map(t=>{
+      const d = quiz.perTopic[t.id];
+      if(!d) return null;
+      return { name:t.name, color:t.color, c:d.c, n:d.n, pct: Math.round(d.c/d.n*100) };
+    }).filter(Boolean);
+
+    showResult({
+      kicker:"Entrevista simulada",
+      scoreText: quiz.correct + "/" + quiz.items.length,
+      msg: pct >= 80 ? "Listo para entrar. Repasa solo lo que salga en rojo abajo."
+         : pct >= 60 ? "Vas bien. Enfócate esta noche en los temas más bajos del desglose."
+         : "Hay terreno por cubrir. Usa Práctica por tema en los de menor porcentaje y vuelve a simular.",
+      grid:[
+        ["Puntaje", pct + "%"],
+        ["Tiempo", mm + ":" + String(ss).padStart(2,"0")],
+        ["Mejor marca", (state.bestMock||0) + "%" + (isBest ? " ✨" : "")]
+      ],
+      breakdown,
+      wrong: quiz.wrongList,
+      againLabel:"Simular otra vez", again:startMock
+    });
+  }
+}
+
+function showResult(cfg){
+  show("s-result");
+  $("#rKicker").textContent = cfg.kicker;
+  $("#rScore").textContent = cfg.scoreText;
+  $("#rMsg").textContent = cfg.msg;
+
+  const g = $("#rGrid"); g.innerHTML = "";
+  cfg.grid.forEach(([label,val])=>{
+    const d = document.createElement("div");
+    d.className = "rstat";
+    d.innerHTML = `<div class="rv">${val}</div><div class="rl">${label}</div>`;
+    g.appendChild(d);
+  });
+
+  const bw = $("#rBreakdownWrap"), bd = $("#rBreakdown");
+  if(cfg.breakdown && cfg.breakdown.length){
+    bw.style.display = ""; bd.innerHTML = "";
+    cfg.breakdown.sort((a,b)=>a.pct-b.pct).forEach(r=>{
+      const row = document.createElement("div");
+      row.className = "brow";
+      row.innerHTML = `
+        <span class="bn">${r.name}</span>
+        <span class="bbar" style="--tc:${r.color}"><i style="width:${r.pct}%"></i></span>
+        <span class="bv">${r.c}/${r.n}</span>`;
+      bd.appendChild(row);
+    });
+  } else bw.style.display = "none";
+
+  const rw = $("#rReviewWrap"), rv = $("#rReview");
+  if(cfg.wrong && cfg.wrong.length){
+    rw.style.display = ""; rv.innerHTML = "";
+    $("#rReviewCount").textContent = cfg.wrong.length + (cfg.wrong.length===1?" pregunta":" preguntas");
+    cfg.wrong.forEach(it=>{
+      const d = document.createElement("div");
+      d.className = "rev-item";
+      d.innerHTML = `
+        <div class="rq">${esc(it.q.q)}</div>
+        <div class="ra"><b>${esc(it.q.opts[it.q.a])}</b> — ${esc(it.q.ex)}</div>`;
+      rv.appendChild(d);
+    });
+  } else rw.style.display = "none";
+
+  const again = $("#rAgain");
+  again.textContent = cfg.againLabel || "Otra ronda";
+  again.onclick = cfg.again;
+
+  renderHome();
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+$$("[data-home]").forEach(b=> b.addEventListener("click", ()=>{
+  if(quiz && quiz.timer) clearInterval(quiz.timer);
+  renderHome(); show("s-home");
+}));
+$$(".mode").forEach(b=> b.addEventListener("click", ()=>{
+  const go = b.dataset.go;
+  if(go === "practice") openPicker("practice");
+  else if(go === "flash") openPicker("flash");
+  else if(go === "mock") startMock();
+}));
+$("#muteBtn").addEventListener("click", ()=>{
+  state.muted = !state.muted; saveState(); renderHud();
+  if(!state.muted) sndOk();
+});
+$("#resetBtn").addEventListener("click", ()=>{
+  if(confirm("¿Borrar tu progreso (XP, nivel y dominio por tema)?")){
+    state = structuredClone(DEFAULT_STATE);
+    saveState(); renderHud(); renderHome();
+    toast("Progreso reiniciado");
+  }
+});
+$("#fcCard").addEventListener("click", ()=>{ if(fc && !fc.flipped) flipFc(); });
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderHud();
+renderHome();
+</script>
