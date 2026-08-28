@@ -99,7 +99,7 @@
   /* home */
   .hero h1{font-size:clamp(1.9rem,6vw,2.9rem);font-weight:800;margin:.3rem 0 .5rem}
   .hero .accent{color:var(--accent)}
-  .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0 30px}
+  .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:24px 0 30px}
   .mode{
     text-align:left;cursor:pointer;color:var(--ink);
     background:linear-gradient(180deg,var(--surface-2),var(--surface));
@@ -110,7 +110,7 @@
   .mode .m-ico{font-size:1.4rem}
   .mode h3{font-size:1.02rem;margin:8px 0 3px;font-weight:700}
   .mode p{margin:0;font-size:.82rem;color:var(--muted)}
-  @media (max-width:620px){.modes{grid-template-columns:1fr}}
+  @media (max-width:520px){.modes{grid-template-columns:1fr}}
 
   .section-label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}
   .section-label h2{font-size:1.15rem;font-weight:700}
@@ -243,6 +243,38 @@
   .rev-item .ra b{color:var(--good)}
   .cta-row{display:flex;gap:11px;flex-wrap:wrap;margin-top:8px}
 
+  /* respuesta abierta / chat IA */
+  .oa-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .oa-sub .q-topic{margin:0}
+  .link-btn{background:none;border:none;color:var(--faint);cursor:pointer;font-size:.76rem;font-family:"IBM Plex Mono",monospace;text-decoration:underline;padding:2px}
+  .link-btn:hover{color:var(--muted)}
+  .ai-cfg{display:none;flex-wrap:wrap;gap:8px;margin:10px 0 4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .ai-cfg.show{display:flex}
+  .ai-cfg label{font-size:.78rem;color:var(--muted);width:100%}
+  .ai-cfg input{flex:1;min-width:200px;background:#0b0e13;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:8px 10px;font-family:"IBM Plex Mono",monospace;font-size:.8rem}
+  .ai-cfg .hint{font-size:.72rem;color:var(--faint);width:100%}
+  .oa-q{font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:1.12rem;text-wrap:pretty;margin-bottom:2px}
+  .chat{display:flex;flex-direction:column;gap:10px;margin:16px 0;max-height:min(46vh,420px);overflow-y:auto;padding-right:4px}
+  .bubble{max-width:86%;padding:10px 13px;border-radius:13px;font-size:.9rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+  .bubble.user{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px;font-weight:500}
+  .bubble.ai{align-self:flex-start;background:var(--surface-3);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .bubble.ai code{font-family:"IBM Plex Mono",monospace;font-size:.82em;background:#0b0e13;padding:1px 5px;border-radius:5px}
+  .bubble.ai strong{color:var(--ink)}
+  .bubble.sys{align-self:center;background:none;border:1px dashed var(--line);color:var(--faint);font-size:.8rem;padding:7px 12px}
+  .verdict-chip{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:2px 8px;border-radius:999px;margin-bottom:7px}
+  .verdict-chip.correcto{background:var(--good);color:#062218}
+  .verdict-chip.parcial{background:var(--accent);color:var(--accent-ink)}
+  .verdict-chip.incorrecto{background:var(--bad);color:#2a0709}
+  .typing span{display:inline-block;width:6px;height:6px;margin:0 1px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite both}
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  .oa-input{display:flex;gap:9px;align-items:flex-end}
+  .oa-input textarea{flex:1;resize:none;background:#0b0e13;border:1px solid var(--line-strong);border-radius:11px;color:var(--ink);padding:11px 13px;font-family:inherit;font-size:.92rem;line-height:1.4;min-height:44px;max-height:140px}
+  .oa-input textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .oa-actions{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+  .oa-hint{font-size:.76rem;color:var(--faint);margin-top:10px}
+
   .toast{
     position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
     background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.86rem;
@@ -288,6 +320,16 @@
         <div class="m-ico">⏱️</div>
         <h3>Entrevista simulada</h3>
         <p>15 preguntas mezcladas, 10 min, sin pistas. Reporte al final.</p>
+      </button>
+      <button class="mode" data-go="open">
+        <div class="m-ico">💬</div>
+        <h3>Respuesta abierta</h3>
+        <p>Contestas con tus palabras, sin ver opciones. Una IA te califica y explica.</p>
+      </button>
+      <button class="mode" data-go="teach">
+        <div class="m-ico">🧑‍🏫</div>
+        <h3>Enséñale a la IA</h3>
+        <p>Explicas el concepto como si dieras clase. La IA hace de alumno y evalúa tu explicación.</p>
       </button>
     </div>
 
@@ -355,6 +397,36 @@
       <div id="fcCodeWrap"></div>
     </div>
     <div class="fc-actions" id="fcActions"></div>
+  </section>
+
+  <!-- ================= RESPUESTA ABIERTA ================= -->
+  <section class="screen" id="s-open">
+    <button class="btn ghost back" data-home>← Salir</button>
+    <div class="q-head">
+      <span class="q-progress"><i id="oaProg"></i></span>
+      <span class="stat mono" id="oaCount" style="color:var(--faint);font-size:.8rem"></span>
+    </div>
+    <div class="card">
+      <div class="oa-sub">
+        <div class="q-topic" id="oaTopic"></div>
+        <button class="link-btn" id="oaCfgBtn">⚙︎ IA</button>
+      </div>
+      <div class="ai-cfg" id="oaCfg">
+        <label>URL de tu backend (deploy en Vercel) — para usar la IA fuera de esa URL</label>
+        <input id="oaCfgInput" type="url" placeholder="https://sprint-entrevista.vercel.app" autocomplete="off" spellcheck="false">
+        <button class="btn" id="oaCfgSave">Guardar</button>
+        <span class="hint">Se guarda solo en este navegador. Si lo dejas vacío, se usa <code>/api/grade</code> del mismo sitio.</span>
+      </div>
+      <div class="oa-q" id="oaQ"></div>
+      <div id="oaCodeWrap"></div>
+      <div class="chat" id="oaChat"></div>
+      <div class="oa-input" id="oaInputRow">
+        <textarea id="oaText" rows="1" placeholder="Escribe tu respuesta…"></textarea>
+        <button class="btn primary" id="oaSend">Responder</button>
+      </div>
+      <div class="oa-actions" id="oaActions"></div>
+      <div class="oa-hint" id="oaHint"></div>
+    </div>
   </section>
 
   <!-- ================= RESULTS ================= -->
@@ -660,6 +732,24 @@ function openPicker(mode){
       c.className = "chip"; c.style.setProperty("--tc", t.color); c.dataset.tc = "1";
       c.textContent = t.name;
       c.addEventListener("click", ()=>startFlash(t.id));
+      chips.appendChild(c);
+    });
+  } else if(mode === "open" || mode === "teach"){
+    const teach = mode === "teach";
+    $("#pickerKicker").textContent = teach ? "Enséñale a la IA" : "Respuesta abierta";
+    $("#pickerTitle").textContent = teach ? "¿Qué tema quieres enseñar?" : "¿Sobre qué tema quieres que te pregunten?";
+    $("#pickerSub").textContent = teach
+      ? "Se te da un concepto y se lo explicas a la IA como si dieras clase. Ella hace de alumno, te pregunta y evalúa tu explicación."
+      : "Verás solo la pregunta. Responde con tus palabras (o di \"no sé\") y la IA te califica y te explica. Puedes repreguntar.";
+    const all = document.createElement("button");
+    all.className = "chip"; all.textContent = "Todos los temas";
+    all.addEventListener("click", ()=>startOpen("all", mode));
+    chips.appendChild(all);
+    TOPICS.forEach(t=>{
+      const c = document.createElement("button");
+      c.className = "chip"; c.style.setProperty("--tc", t.color); c.dataset.tc = "1";
+      c.textContent = t.name;
+      c.addEventListener("click", ()=>startOpen(t.id, mode));
       chips.appendChild(c);
     });
   }
@@ -1001,6 +1091,242 @@ function showResult(cfg){
 }
 
 /* ============================================================
+   RESPUESTA ABIERTA + IA
+   ============================================================ */
+let oa = null;
+let _openBound = false;
+
+function aiBase(){
+  try{ return (localStorage.getItem("grade-base") || "").replace(/\/+$/,""); }catch(e){ return ""; }
+}
+function gradeEndpoint(){ return aiBase() + "/api/grade"; }
+
+async function aiGrade(payload){
+  const ctrl = new AbortController();
+  const to = setTimeout(()=>ctrl.abort(), 30000);
+  try{
+    const r = await fetch(gradeEndpoint(), {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    });
+    clearTimeout(to);
+    if(!r.ok){
+      let code = "http_" + r.status;
+      try{ const j = await r.json(); if(j && j.error) code = j.error; }catch(e){}
+      return { ok:false, code };
+    }
+    const j = await r.json();
+    if(!j || typeof j.reply !== "string" || !j.reply.trim()) return { ok:false, code:"bad_reply" };
+    return { ok:true, reply: j.reply };
+  }catch(e){
+    clearTimeout(to);
+    return { ok:false, code: e.name === "AbortError" ? "timeout" : "network" };
+  }
+}
+
+function startOpen(scope, kind){
+  kind = kind === "teach" ? "teach" : "grade";
+  let items = [];
+  if(scope === "all"){
+    TOPICS.forEach(t=> t.qs.forEach((q,i)=> items.push({q, qi:i, tid:t.id})));
+  } else {
+    topicById(scope).qs.forEach((q,i)=> items.push({q, qi:i, tid:scope}));
+  }
+  oa = { kind, items: shuffle(items).slice(0, kind === "teach" ? 8 : (scope === "all" ? 15 : 12)),
+         idx:0, scope, correct:0, partial:0, xpGain:0, graded:false, history:[], busy:false, aiDown:false };
+  show("s-open");
+  bindOpenOnce();
+  renderOpen();
+}
+
+function bindOpenOnce(){
+  if(_openBound) return; _openBound = true;
+  const ta = $("#oaText");
+  ta.addEventListener("input", ()=>{ ta.style.height="auto"; ta.style.height=Math.min(ta.scrollHeight,140)+"px"; });
+  ta.addEventListener("keydown", e=>{
+    if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendOpen(ta.value); }
+  });
+  $("#oaSend").addEventListener("click", ()=> sendOpen($("#oaText").value));
+  $("#oaCfgBtn").addEventListener("click", ()=> $("#oaCfg").classList.toggle("show"));
+  $("#oaCfgSave").addEventListener("click", ()=>{
+    const v = $("#oaCfgInput").value.trim().replace(/\/+$/,"");
+    try{ if(v) localStorage.setItem("grade-base", v); else localStorage.removeItem("grade-base"); }catch(e){}
+    $("#oaCfg").classList.remove("show");
+    toast(v ? "Backend guardado" : "Backend borrado");
+  });
+}
+
+function renderOpen(){
+  const it = oa.items[oa.idx];
+  const teach = oa.kind === "teach";
+  oa.graded = false; oa.history = []; oa.busy = false;
+  $("#oaProg").style.width = (oa.idx/oa.items.length*100) + "%";
+  $("#oaCount").textContent = (oa.idx+1) + " / " + oa.items.length;
+  $("#oaTopic").textContent = topicById(it.tid).name + (teach ? "  ·  enséñale a la IA" : "  ·  respuesta abierta");
+  $("#oaQ").textContent = (teach ? "Explícale a la IA: " : "") + it.q.q;
+  const cw = $("#oaCodeWrap"); cw.innerHTML = "";
+  if(it.q.code){
+    const pre = document.createElement("pre"); pre.className = "code"; pre.textContent = it.q.code;
+    cw.appendChild(pre);
+  }
+  $("#oaChat").innerHTML = "";
+  if(teach) addBubble("sys", "Explica el concepto con tus palabras, como si dieras clase. La IA hará de alumno: te preguntará si algo no queda claro y al final evaluará tu explicación.");
+  $("#oaActions").innerHTML = "";
+  $("#oaHint").textContent = "";
+  const ta = $("#oaText");
+  ta.value = ""; ta.style.height = "auto"; ta.disabled = false;
+  ta.placeholder = teach ? "Explica el concepto con tus palabras…" : "Escribe tu respuesta…";
+  $("#oaInputRow").style.display = "";
+  $("#oaSend").disabled = false; $("#oaSend").textContent = teach ? "Explicar" : "Responder";
+  try{ $("#oaCfgInput").value = localStorage.getItem("grade-base") || ""; }catch(e){}
+  ta.focus();
+}
+
+function addBubble(role, html, cls){
+  const d = document.createElement("div");
+  d.className = "bubble " + role + (cls ? " " + cls : "");
+  d.innerHTML = html;
+  const chat = $("#oaChat");
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+
+function fmt(s){
+  let h = esc(s);
+  h = h.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  h = h.replace(/`([^`]+)`/g, "<code>$1</code>");
+  return h;
+}
+
+async function sendOpen(raw){
+  if(!oa || oa.busy) return;
+  const it = oa.items[oa.idx];
+  let text = (raw || "").trim();
+  const isFirst = !oa.graded;
+  if(isFirst && !text && oa.kind !== "teach") text = "No sé la respuesta.";
+  if(!text) return;
+
+  const ta = $("#oaText");
+  ta.value = ""; ta.style.height = "auto";
+  addBubble("user", esc(text));
+  oa.history.push({ role:"user", content: text });
+
+  oa.busy = true;
+  $("#oaSend").disabled = true;
+  const typing = addBubble("ai", '<span class="typing"><span></span><span></span><span></span></span>', "typing");
+
+  const res = await aiGrade({
+    mode: oa.kind,
+    question: it.q.q,
+    code: it.q.code || "",
+    correct: it.q.opts[it.q.a],
+    explain: it.q.ex,
+    topic: topicById(it.tid).name,
+    history: oa.history
+  });
+
+  if(!$("#s-open").classList.contains("active")) return;
+  typing.remove();
+  oa.busy = false;
+  $("#oaSend").disabled = false;
+
+  if(!res.ok){
+    oa.aiDown = true;
+    oa.history.pop();
+    fallbackReveal(res.code);
+    return;
+  }
+
+  oa.history.push({ role:"assistant", content: res.reply });
+
+  let body = res.reply, verdict = null;
+  const m = res.reply.match(/^\s*VEREDICTO:\s*(CORRECTO|PARCIAL|INCORRECTO)\s*\n?/i);
+  if(m){ verdict = m[1].toUpperCase(); body = res.reply.slice(m[0].length); }
+  const chip = verdict ? `<span class="verdict-chip ${verdict.toLowerCase()}">${verdict}</span>` : "";
+  addBubble("ai", chip + fmt(body.trim()));
+
+  if(isFirst){
+    oa.graded = true;
+    if(verdict === "CORRECTO"){ oa.correct++; oa.xpGain+=15; markMastered(it.tid, it.qi); bumpSeen(it.tid, true); addXp(15); sndOk(); }
+    else if(verdict === "PARCIAL"){ oa.partial++; oa.xpGain+=8; bumpSeen(it.tid, true); addXp(8); }
+    else { bumpSeen(it.tid, false); sndNo(); }
+    $("#oaSend").textContent = "Enviar";
+    ta.placeholder = "Pregunta lo que quieras sobre esto… o pulsa Siguiente";
+    renderOpenActions();
+  }
+}
+
+function renderOpenActions(){
+  const a = $("#oaActions"); a.innerHTML = "";
+  const next = document.createElement("button");
+  next.className = "btn primary";
+  next.textContent = oa.idx >= oa.items.length - 1 ? "Ver resultado" : "Siguiente pregunta →";
+  next.addEventListener("click", advanceOpen);
+  a.appendChild(next);
+}
+
+function advanceOpen(){
+  oa.idx++;
+  if(oa.idx >= oa.items.length){ finishOpen(); return; }
+  renderOpen();
+}
+
+function fallbackReveal(code){
+  const it = oa.items[oa.idx];
+  const msgs = {
+    no_key:"El backend responde pero no tiene API key configurada.",
+    timeout:"La IA tardó demasiado en responder.",
+    network:"No se pudo contactar al backend de IA.",
+    upstream:"El proveedor de IA devolvió un error.",
+    bad_request:"El backend rechazó la petición.",
+    bad_reply:"Respuesta inválida del backend."
+  };
+  const teach = oa.kind === "teach";
+  addBubble("sys", (msgs[code] || ("IA no disponible (" + code + ").")) + (teach
+    ? " Te muestro la explicación de referencia para que compares con la tuya."
+    : " Te muestro la respuesta modelo para que te autoevalúes."));
+  addBubble("ai", "<strong>" + (teach ? "Referencia:" : "Respuesta correcta:") + "</strong> " + esc(it.q.opts[it.q.a]) + "<br><br>" + fmt(it.q.ex));
+  $("#oaInputRow").style.display = "none";
+  const a = $("#oaActions"); a.innerHTML = "";
+  if(!oa.graded){
+    const mk = (label, cls, fn)=>{ const b=document.createElement("button"); b.className="btn"+(cls?" "+cls:""); b.textContent=label; b.addEventListener("click",fn); return b; };
+    a.appendChild(mk(teach ? "La expliqué bien" : "La sabía", "primary", ()=>{ oa.graded=true; oa.correct++; oa.xpGain+=12; markMastered(it.tid,it.qi); bumpSeen(it.tid,true); addXp(12); renderOpenActions(); }));
+    a.appendChild(mk("A repasar", "", ()=>{ oa.graded=true; bumpSeen(it.tid,false); renderOpenActions(); }));
+  } else {
+    renderOpenActions();
+  }
+  $("#oaHint").innerHTML = 'Para activar la IA: despliega en Vercel con tu API key gratuita, o pon la URL de ese backend en <b>⚙︎ IA</b>.';
+}
+
+function finishOpen(){
+  const teach = oa.kind === "teach";
+  const total = oa.items.length;
+  const pct = Math.round((oa.correct + oa.partial*0.5)/total*100);
+  showResult({
+    kicker: teach ? "Enséñale a la IA" : "Respuesta abierta",
+    scoreText: oa.correct + "/" + total,
+    msg: oa.aiDown
+      ? "Parte de la sesión fue en autoevaluación (la IA no respondió). Aun así, explicar en voz alta es lo que más fija el concepto."
+      : teach
+        ? (pct >= 80 ? "Enseñar es la mejor prueba de que lo entiendes. Lo explicaste con claridad."
+          : pct >= 50 ? "Vas bien. Vuelve a los conceptos parciales y explícalos de nuevo, más precisos."
+          : "Explicar destapa los huecos. Repite estos temas: es justo donde más vas a aprender.")
+      : (pct >= 80 ? "Muy bien: puedes explicar los conceptos con tus palabras, no solo reconocerlos."
+        : pct >= 50 ? "Vas bien. Repite las parciales enfocándote en ser preciso y concreto."
+        : "Sigue practicando en voz alta. Explicar cuesta más que reconocer una opción — por eso funciona."),
+    grid:[
+      [teach ? "Bien explicadas" : "Correctas", oa.correct + "/" + total],
+      ["Parciales", oa.partial],
+      ["XP ganada", oa.xpGain]
+    ],
+    againLabel:"Otra ronda", again:()=>startOpen(oa.scope, oa.kind)
+  });
+}
+
+/* ============================================================
    EVENTOS
    ============================================================ */
 $$("[data-home]").forEach(b=> b.addEventListener("click", ()=>{
@@ -1012,6 +1338,8 @@ $$(".mode").forEach(b=> b.addEventListener("click", ()=>{
   if(go === "practice") openPicker("practice");
   else if(go === "flash") openPicker("flash");
   else if(go === "mock") startMock();
+  else if(go === "open") openPicker("open");
+  else if(go === "teach") openPicker("teach");
 }));
 $("#muteBtn").addEventListener("click", ()=>{
   state.muted = !state.muted; saveState(); renderHud();
