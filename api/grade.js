@@ -94,13 +94,22 @@ export default async function handler(req, res) {
   try {
     const upstream = await fetch(baseUrl + "/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key.trim()}` },
       body: JSON.stringify({ model, messages: msgs, temperature: 0.3, max_tokens: 700 }),
     });
 
     if (!upstream.ok) {
-      const detail = (await upstream.text()).slice(0, 300);
-      return res.status(502).json({ error: "upstream", status: upstream.status, detail });
+      const raw = (await upstream.text()).slice(0, 400);
+      let detail = raw;
+      try { detail = JSON.parse(raw).error?.message || raw; } catch (e) {}
+      const s = upstream.status;
+      console.error("[grade] upstream", s, "model=", model, "base=", baseUrl, "detail=", detail);
+      const error =
+        s === 401 || s === 403 ? "bad_key" :
+        s === 404 ? "model_not_found" :
+        s === 429 ? "rate_limit" :
+        "upstream";
+      return res.status(502).json({ error, status: s, detail, model, baseUrl });
     }
 
     const data = await upstream.json();
@@ -111,6 +120,6 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ reply });
   } catch (e) {
-    return res.status(502).json({ error: "upstream_unreachable" });
+    return res.status(502).json({ error: "upstream_unreachable", detail: String(e && e.message || e) });
   }
 }

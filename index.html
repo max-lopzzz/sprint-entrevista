@@ -1113,9 +1113,9 @@ async function aiGrade(payload){
     });
     clearTimeout(to);
     if(!r.ok){
-      let code = "http_" + r.status;
-      try{ const j = await r.json(); if(j && j.error) code = j.error; }catch(e){}
-      return { ok:false, code };
+      let code = "http_" + r.status, detail = "";
+      try{ const j = await r.json(); if(j && j.error) code = j.error; if(j && j.detail) detail = String(j.detail); }catch(e){}
+      return { ok:false, code, detail };
     }
     const j = await r.json();
     if(!j || typeof j.reply !== "string" || !j.reply.trim()) return { ok:false, code:"bad_reply" };
@@ -1236,7 +1236,7 @@ async function sendOpen(raw){
   if(!res.ok){
     oa.aiDown = true;
     oa.history.pop();
-    fallbackReveal(res.code);
+    fallbackReveal(res.code, res.detail);
     return;
   }
 
@@ -1274,20 +1274,26 @@ function advanceOpen(){
   renderOpen();
 }
 
-function fallbackReveal(code){
+function fallbackReveal(code, detail){
   const it = oa.items[oa.idx];
   const msgs = {
-    no_key:"El backend responde pero no tiene API key configurada.",
+    no_key:"El backend está desplegado pero no tiene la variable LLM_API_KEY.",
+    bad_key:"El proveedor rechazó la API key (revisa la key en Vercel y haz Redeploy).",
+    model_not_found:"El proveedor no reconoce el modelo (revisa LLM_MODEL en Vercel).",
+    rate_limit:"Llegaste al límite de peticiones del proveedor. Espera un momento.",
     timeout:"La IA tardó demasiado en responder.",
-    network:"No se pudo contactar al backend de IA.",
+    network:"No se pudo contactar al backend de IA (¿URL de ⚙︎ IA correcta?).",
     upstream:"El proveedor de IA devolvió un error.",
+    upstream_unreachable:"El backend no pudo contactar al proveedor de IA.",
     bad_request:"El backend rechazó la petición.",
+    empty_reply:"El proveedor respondió vacío.",
     bad_reply:"Respuesta inválida del backend."
   };
   const teach = oa.kind === "teach";
   addBubble("sys", (msgs[code] || ("IA no disponible (" + code + ").")) + (teach
     ? " Te muestro la explicación de referencia para que compares con la tuya."
     : " Te muestro la respuesta modelo para que te autoevalúes."));
+  if(detail) addBubble("sys", "Detalle del proveedor: " + esc(String(detail).slice(0,240)));
   addBubble("ai", "<strong>" + (teach ? "Referencia:" : "Respuesta correcta:") + "</strong> " + esc(it.q.opts[it.q.a]) + "<br><br>" + fmt(it.q.ex));
   $("#oaInputRow").style.display = "none";
   const a = $("#oaActions"); a.innerHTML = "";
