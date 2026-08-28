@@ -38,6 +38,12 @@ Abre `index.html` en el navegador. No necesita servidor.
 Los modos con IA necesitan el backend (ver abajo); sin él, caen a un modo de
 autoevaluación (revela la respuesta modelo y te calificas tú).
 
+Para probar los modos con IA en local hay un servidor incluido:
+
+```
+LLM_API_KEY=tu_key_de_groq node dev-server.mjs   # http://localhost:4600
+```
+
 ## Deploy en Vercel
 
 1. Importa el repo en Vercel. Sin configuración: no hay build, la raíz sirve `index.html`
