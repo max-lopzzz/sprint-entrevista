@@ -83,6 +83,49 @@ test("generate: unparseable twice -> 502 bad_json", async () => {
   globalThis.fetch = orig;
 });
 
+test("generate: retries once when first output has too few valid questions, then 200", async () => {
+  process.env.LLM_API_KEY = "k";
+  const orig = globalThis.fetch;
+  const tooFew = JSON.stringify({
+    questions: [
+      { topic: "SQL", q: "Q1", opts: ["a", "b", "c", "d"], a: 0, ex: "porque sí" },
+      { topic: "SQL", q: "Q2", opts: ["a", "b", "c", "d"], a: 1, ex: "porque sí" },
+    ],
+  });
+  let call = 0;
+  globalThis.fetch = mockFetch([
+    ["chat/completions", () => {
+      call++;
+      const content = call === 1 ? tooFew : okQuestions;
+      return new Response(JSON.stringify({ choices: [{ message: { content } }] }), { status: 200 });
+    }],
+  ]);
+  const res = resShim();
+  await handler({ method: "POST", body: JSON.stringify({ jobDescription: "Analista", language: "es" }) }, res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(call, 2);
+  assert.equal(res.body.meta.kept, 18);
+  globalThis.fetch = orig;
+});
+
+test("generate: too few valid questions on both attempts -> 502 bad_json", async () => {
+  process.env.LLM_API_KEY = "k";
+  const orig = globalThis.fetch;
+  const tooFew = JSON.stringify({
+    questions: [{ topic: "SQL", q: "Q1", opts: ["a", "b", "c", "d"], a: 0, ex: "porque sí" }],
+  });
+  let call = 0;
+  globalThis.fetch = mockFetch([
+    ["chat/completions", () => { call++; return new Response(JSON.stringify({ choices: [{ message: { content: tooFew } }] }), { status: 200 }); }],
+  ]);
+  const res = resShim();
+  await handler({ method: "POST", body: JSON.stringify({ jobDescription: "Analista", language: "es" }) }, res);
+  assert.equal(res.statusCode, 502);
+  assert.equal(res.body.error, "bad_json");
+  assert.equal(call, 2);
+  globalThis.fetch = orig;
+});
+
 test("generate: github 403 sets meta.githubSkipped and still succeeds", async () => {
   process.env.LLM_API_KEY = "k";
   const orig = globalThis.fetch;

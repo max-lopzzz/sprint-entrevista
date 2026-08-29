@@ -112,20 +112,34 @@ export default async function handler(req, res) {
 
   const messages = buildMessages({ jobDescription: b.jobDescription, cv: b.cv, projectsSummary, language, count });
 
+  // Up to one retry total: either the model didn't return valid JSON, or it
+  // did but too few items survived validation (spec: retry once on <6 valid).
   let parsed = null;
-  for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
-    const msgs = attempt === 0 ? messages
-      : [...messages, { role: "user", content: "Your previous answer was not valid JSON. Reply again with ONLY the JSON object." }];
+  let topics = [], kept = 0, dropped = 0;
+  let failReason = null; // "bad_json" | "few"
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let msgs = messages;
+    if (attempt > 0) {
+      const reminder = failReason === "bad_json"
+        ? "Your previous answer was not valid JSON. Reply again with ONLY the JSON object."
+        : `Your previous answer only had ${kept} usable question(s) after validation (need at least 6). ` +
+          `Re-check the rules: "opts" must be exactly 4 distinct non-empty strings, "a" a valid 0-based ` +
+          `index, "q" and "ex" non-empty. Reply again with ONLY the JSON object containing ${count} ` +
+          `well-formed questions.`;
+      msgs = [...messages, { role: "user", content: reminder }];
+    }
     const out = await callChat({ provider, messages: msgs, temperature: 0.4, maxTokens: 4500, jsonMode: true });
     if (!out.ok) {
       const status = out.error === "no_key" ? 503 : 502;
       return res.status(status).json({ error: out.error, status: out.status, detail: out.detail, model: provider.model });
     }
     parsed = parseQuestions(out.content);
+    if (!parsed) { failReason = "bad_json"; continue; }
+    ({ topics, kept, dropped } = validateQuestions(parsed, { count, fallbackTopic: "General" }));
+    if (kept >= 6) { failReason = null; break; }
+    failReason = "few";
   }
   if (!parsed) return res.status(502).json({ error: "bad_json" });
-
-  const { topics, kept, dropped } = validateQuestions(parsed, { count, fallbackTopic: language === "en" ? "General" : "General" });
   if (kept < 6) return res.status(502).json({ error: "bad_json", detail: `only ${kept} valid questions` });
 
   return res.status(200).json({
