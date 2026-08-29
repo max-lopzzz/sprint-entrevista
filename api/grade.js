@@ -18,6 +18,8 @@
 //   Gemini     : LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai   LLM_MODEL=gemini-2.0-flash
 //   Ollama     : LLM_BASE_URL=http://localhost:11434/v1           LLM_MODEL=llama3.1   (solo local)
 
+import { resolveProvider, callChat, NoKeyError } from "./_llm.js";
+
 const MAX_TURNS = 24;
 const MAX_CHARS = 4000;
 
@@ -67,9 +69,6 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
 
-  const key = process.env.LLM_API_KEY;
-  if (!key) return res.status(503).json({ error: "no_key" });
-
   let b;
   try {
     b = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
@@ -92,38 +91,14 @@ export default async function handler(req, res) {
     msgs.push({ role: m.role, content: m.content.slice(0, MAX_CHARS) });
   }
 
-  const baseUrl = (process.env.LLM_BASE_URL || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
-  const model = process.env.LLM_MODEL || "openai/gpt-oss-120b";
+  let provider;
+  try { provider = resolveProvider({ userKey: b.userKey }); }
+  catch (e) { if (e instanceof NoKeyError) return res.status(503).json({ error: "no_key" }); throw e; }
 
-  try {
-    const upstream = await fetch(baseUrl + "/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key.trim()}` },
-      body: JSON.stringify({ model, messages: msgs, temperature: 0.3, max_tokens: 700 }),
-    });
-
-    if (!upstream.ok) {
-      const raw = (await upstream.text()).slice(0, 400);
-      let detail = raw;
-      try { detail = JSON.parse(raw).error?.message || raw; } catch (e) {}
-      const s = upstream.status;
-      console.error("[grade] upstream", s, "model=", model, "base=", baseUrl, "detail=", detail);
-      const error =
-        s === 401 || s === 403 ? "bad_key" :
-        s === 404 ? "model_not_found" :
-        s === 429 ? "rate_limit" :
-        "upstream";
-      return res.status(502).json({ error, status: s, detail, model, baseUrl });
-    }
-
-    const data = await upstream.json();
-    const reply = data && data.choices && data.choices[0] && data.choices[0].message
-      ? data.choices[0].message.content
-      : "";
-    if (!reply || !reply.trim()) return res.status(502).json({ error: "empty_reply" });
-
-    return res.status(200).json({ reply });
-  } catch (e) {
-    return res.status(502).json({ error: "upstream_unreachable", detail: String(e && e.message || e) });
+  const out = await callChat({ provider, messages: msgs, temperature: 0.3, maxTokens: 700 });
+  if (!out.ok) {
+    const status = out.error === "no_key" ? 503 : 502;
+    return res.status(status).json({ error: out.error, status: out.status, detail: out.detail, model: provider.model });
   }
+  return res.status(200).json({ reply: out.content });
 }
