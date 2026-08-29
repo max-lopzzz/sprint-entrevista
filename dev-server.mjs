@@ -16,6 +16,7 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 4600;
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8", ".wasm": "application/wasm",
   ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml",
 };
 
@@ -26,6 +27,17 @@ function resShim(res) {
 }
 
 createServer(async (req, res) => {
+  if (req.url === "/api/generate" || req.url.startsWith("/api/generate?")) {
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", async () => {
+      req.body = body;
+      const mod = await import("./api/generate.js");
+      try { await mod.default(req, resShim(res)); }
+      catch (e) { res.statusCode = 500; res.end(JSON.stringify({ error: "handler_threw", detail: String(e) })); }
+    });
+    return;
+  }
   if (req.url === "/api/grade" || req.url.startsWith("/api/grade?")) {
     let body = "";
     req.on("data", (c) => (body += c));
