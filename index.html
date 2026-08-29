@@ -471,6 +471,8 @@
       <div class="ai-cfg" id="oaCfg">
         <label data-i18n="oa_cfg_url_label">URL de tu backend (deploy en Vercel) — para usar la IA fuera de esa URL</label>
         <input id="oaCfgInput" type="url" placeholder="https://sprint-entrevista.vercel.app" autocomplete="off" spellcheck="false">
+        <label class="ai-cfg-label" data-i18n="oa_cfg_key_label" for="oaKeyInput"></label>
+        <input id="oaKeyInput" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…">
         <button class="btn" id="oaCfgSave" data-i18n="oa_cfg_save">Guardar</button>
         <span class="hint">Se guarda solo en este navegador. Si lo dejas vacío, se usa <code>/api/grade</code> del mismo sitio.</span>
       </div>
@@ -1429,6 +1431,27 @@ function showResult(cfg){
 }
 
 /* ============================================================
+   QUOTA + USER KEY
+   ============================================================ */
+const GEN_LIMIT = 5;
+function _today() { return new Date().toISOString().slice(0, 10); }
+function userKey() { try { return (localStorage.getItem("sprint-user-key") || "").trim(); } catch (e) { return ""; } }
+function genQuota() {
+  let q; try { q = JSON.parse(localStorage.getItem("sprint-gen-usage") || ""); } catch (e) {}
+  if (!q || q.day !== _today()) q = { day: _today(), count: 0 };
+  return q;
+}
+function checkGenQuota() {
+  if (userKey()) return { ok: true };
+  return genQuota().count < GEN_LIMIT ? { ok: true } : { ok: false, limit: GEN_LIMIT };
+}
+function bumpGenQuota() {
+  if (userKey()) return;
+  const q = genQuota(); q.count++;
+  try { localStorage.setItem("sprint-gen-usage", JSON.stringify(q)); } catch (e) {}
+}
+
+/* ============================================================
    RESPUESTA ABIERTA + IA
    ============================================================ */
 let oa = null;
@@ -1446,7 +1469,7 @@ async function aiGrade(payload){
     const r = await fetch(gradeEndpoint(), {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, userKey: userKey() || undefined }),
       signal: ctrl.signal
     });
     clearTimeout(to);
@@ -1491,6 +1514,8 @@ function bindOpenOnce(){
   $("#oaCfgSave").addEventListener("click", ()=>{
     const v = $("#oaCfgInput").value.trim().replace(/\/+$/,"");
     try{ if(v) localStorage.setItem("grade-base", v); else localStorage.removeItem("grade-base"); }catch(e){}
+    const k = $("#oaKeyInput").value.trim();
+    try{ if(k) localStorage.setItem("sprint-user-key", k); else localStorage.removeItem("sprint-user-key"); }catch(e){}
     $("#oaCfg").classList.remove("show");
     toast(v ? t("oa_cfg_saved") : t("oa_cfg_cleared"));
   });
@@ -1519,6 +1544,7 @@ function renderOpen(){
   $("#oaInputRow").style.display = "";
   $("#oaSend").disabled = false; $("#oaSend").textContent = teach ? t("oa_send_explain") : t("oa_send_answer");
   try{ $("#oaCfgInput").value = localStorage.getItem("grade-base") || ""; }catch(e){}
+  $("#oaKeyInput").value = userKey();
   ta.focus();
 }
 
@@ -1769,8 +1795,7 @@ async function runGeneration() {
   const btn = $("#genBtn"), msg = $("#setupMsg");
   msg.className = "setup-msg"; msg.textContent = "";
 
-  // TODO(task-9): remove guard once gen quota lands
-  const cap = (typeof checkGenQuota === "function") ? checkGenQuota() : { ok: true };
+  const cap = checkGenQuota();
   if (!cap.ok) { msg.className = "setup-msg err"; msg.textContent = t("setup_limit_reached", { n: cap.limit }); return; }
 
   const payload = {
@@ -1780,7 +1805,7 @@ async function runGeneration() {
     projectsText: $("#projInput").value.trim() || undefined,
     language: lang,
     count: Number($("#countSel").value),
-    userKey: (typeof userKey === "function" ? userKey() : "") || undefined,
+    userKey: userKey() || undefined,
   };
 
   btn.disabled = true;
@@ -1796,7 +1821,7 @@ async function runGeneration() {
       const detail = j.detail || j.error || ("HTTP " + r.status);
       throw new Error(detail);
     }
-    if (typeof bumpGenQuota === "function") bumpGenQuota();          // TODO(task-9): remove guard once gen quota lands
+    bumpGenQuota();
     const bank = addBank({
       title: payload.jobDescription.slice(0, 48),
       lang: payload.language,

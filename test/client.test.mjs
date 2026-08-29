@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { extractClientHelpers } from "./helpers.mjs";
+import { extractClientHelpers, fakeLocalStorage } from "./helpers.mjs";
 
 test("t(): interpolates and falls back es -> key", () => {
   const { t, STR } = extractClientHelpers(["t", "STR"], { });
@@ -31,6 +31,18 @@ test("banks store: add prefixes topic ids and persists; delete removes", () => {
   api.deleteBank(b.id);
   assert.equal(api.banksList().length, 0);
   assert.equal(api.activeBank(), null);
+});
+
+test("quota: resets on new day, blocks at limit, bypassed by userKey", async () => {
+  const ls = fakeLocalStorage();
+  const api = extractClientHelpers(
+    ["genQuota","checkGenQuota","bumpGenQuota","userKey","GEN_LIMIT"], { localStorage: ls },
+  );
+  assert.equal(api.checkGenQuota().ok, true);
+  for (let i = 0; i < api.GEN_LIMIT; i++) api.bumpGenQuota();
+  assert.equal(api.checkGenQuota().ok, false);
+  ls.setItem("sprint-user-key", "sk-abc");
+  assert.equal(api.checkGenQuota().ok, true);   // key bypasses
 });
 
 test("DEMO_BANK has 8-12 valid questions per language", () => {
