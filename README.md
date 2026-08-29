@@ -7,7 +7,8 @@ opcionales (`api/generate.js`, `api/grade.js`) para la generación y evaluación
 ## Cómo funciona
 
 1. Pega la **descripción del empleo** (obligatorio).
-2. Opcional: pega tu **CV** o suelta un `.pdf` / `.docx` / `.txt` (se lee en tu navegador, no se sube).
+2. Opcional: pega tu **CV** o suelta un `.pdf` / `.docx` / `.txt` (el archivo se lee en tu navegador; el
+   texto extraído sí se envía a la IA al generar el banco, pero no se guarda en ningún servidor).
 3. Opcional: tu **usuario de GitHub** y/o una descripción de tus proyectos.
 4. La IA genera un banco de preguntas de opción múltiple adaptado a ti, en español o inglés.
 
