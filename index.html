@@ -288,6 +288,27 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   .foot-note{margin-top:40px;text-align:center;font-size:.76rem;color:var(--faint)}
+
+  /* ===== Setup screen ===== */
+  .setup-label{display:block;font-family:"IBM Plex Mono",monospace;font-size:.8rem;letter-spacing:.04em;color:var(--muted);margin:18px 0 7px}
+  .setup-ta,.setup-inp{width:100%;box-sizing:border-box;background:#0b0e13;border:1px solid var(--line-strong);border-radius:11px;color:var(--ink);padding:11px 13px;font-family:inherit;font-size:.92rem;line-height:1.45}
+  .setup-ta{resize:vertical;min-height:88px}
+  .setup-ta:focus,.setup-inp:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .setup-more{margin:14px 0;border-top:1px solid var(--line)}
+  .setup-more summary{cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:.82rem;color:var(--muted);padding:8px 0;list-style:none}
+  .setup-more summary::-webkit-details-marker{display:none}
+  .setup-more summary::before{content:"+ ";color:var(--faint)}
+  .setup-more[open] summary::before{content:"– "}
+  .setup-more .setup-inp{margin-bottom:9px}
+  .setup-drop{border:1px dashed var(--line-strong);border-radius:11px;text-align:center;padding:18px;cursor:pointer;color:var(--muted);font-size:.86rem;margin-bottom:9px}
+  .setup-drop.over{border-color:var(--accent);background:var(--surface-2)}
+  .setup-filemsg{font-size:.78rem;color:var(--faint);margin:0 0 9px;min-height:1em}
+  .setup-row{display:flex;gap:10px;align-items:center;margin:14px 0}
+  .setup-row label{font-family:"IBM Plex Mono",monospace;font-size:.82rem;color:var(--muted)}
+  .setup-row select{background:#0b0e13;border:1px solid var(--line-strong);border-radius:9px;color:var(--ink);padding:7px 10px;font-family:inherit}
+  .setup-actions{margin:16px 0 6px}
+  .setup-msg{font-size:.82rem;color:var(--faint);margin:6px 0 0}
+  .setup-msg.err{color:var(--bad)}
 </style>
 
 <div class="wrap">
@@ -301,6 +322,41 @@
     <button class="icon-btn" id="muteBtn" title="Silenciar sonido" data-i18n-title="mute">♪</button>
     <button class="icon-btn" id="resetBtn" title="Reiniciar progreso" data-i18n-title="reset">⟲</button>
   </div>
+
+  <!-- ================= SETUP ================= -->
+  <section class="screen" id="s-setup">
+    <p class="eyebrow" data-i18n="brand"></p>
+    <h1 id="setupTitle" data-i18n="setup_title" style="font-size:1.7rem;font-weight:800;margin:.3rem 0 .2rem"></h1>
+    <p class="lede" data-i18n="setup_sub"></p>
+
+    <label class="setup-label" data-i18n="setup_job_label" for="jobInput"></label>
+    <textarea id="jobInput" class="setup-ta" rows="6" data-i18n-ph="setup_job_ph"></textarea>
+
+    <details class="setup-more">
+      <summary data-i18n="setup_cv_label"></summary>
+      <div id="cvDrop" class="setup-drop"><span data-i18n="setup_cv_drop"></span>
+        <input id="cvFile" type="file" accept=".pdf,.docx,.txt,.md" hidden>
+      </div>
+      <p id="cvFileMsg" class="setup-filemsg"></p>
+      <textarea id="cvInput" class="setup-ta" rows="6" data-i18n-ph="setup_cv_ph"></textarea>
+    </details>
+
+    <details class="setup-more">
+      <summary data-i18n="setup_projects_label"></summary>
+      <input id="ghInput" class="setup-inp" type="text" autocomplete="off" spellcheck="false" data-i18n-ph="setup_gh_ph">
+      <textarea id="projInput" class="setup-ta" rows="4" data-i18n-ph="setup_projects_ph"></textarea>
+    </details>
+
+    <div class="setup-row">
+      <label data-i18n="setup_count_label" for="countSel"></label>
+      <select id="countSel"><option>12</option><option selected>18</option><option>24</option></select>
+    </div>
+
+    <div class="setup-actions">
+      <button class="btn primary" id="genBtn" data-i18n="setup_generate"></button>
+    </div>
+    <p id="setupMsg" class="setup-msg"></p>
+  </section>
 
   <!-- ================= HOME ================= -->
   <section class="screen active" id="s-home">
@@ -1638,6 +1694,151 @@ function finishOpen(){
     againLabel:t("result_again"), again:()=>startOpen(oa.scope, oa.kind)
   });
 }
+
+/* ============================================================
+   FILE EXTRACTION (lazy; degrades when vendor libs 404)
+   ============================================================ */
+let fileSupport = true;
+let _pdfLib = null, _mammothLoaded = null;
+
+async function loadPdfLib() {
+  if (_pdfLib) return _pdfLib;
+  const mod = await import("/vendor/pdf.min.mjs");
+  mod.GlobalWorkerOptions.workerSrc = "/vendor/pdf.worker.min.mjs";
+  _pdfLib = mod;
+  return mod;
+}
+function loadMammoth() {
+  if (_mammothLoaded) return _mammothLoaded;
+  _mammothLoaded = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "/vendor/mammoth.browser.min.js";
+    s.onload = () => resolve(window.mammoth);
+    s.onerror = () => reject(new Error("mammoth load failed"));
+    document.head.appendChild(s);
+  });
+  return _mammothLoaded;
+}
+
+async function extractFileText(file) {
+  const name = (file.name || "").toLowerCase();
+  if (name.endsWith(".txt") || name.endsWith(".md")) return (await file.text()).slice(0, 20000);
+  if (name.endsWith(".pdf")) {
+    const pdfjs = await loadPdfLib();
+    const buf = await file.arrayBuffer();
+    const doc = await pdfjs.getDocument({ data: buf }).promise;
+    let out = "";
+    for (let p = 1; p <= doc.numPages && out.length < 15000; p++) {
+      const page = await doc.getPage(p);
+      const tc = await page.getTextContent();
+      out += tc.items.map((i) => i.str).join(" ") + "\n";
+    }
+    return out.slice(0, 15000);
+  }
+  if (name.endsWith(".docx")) {
+    const m = await loadMammoth();
+    const buf = await file.arrayBuffer();
+    const r = await m.convertToPlainText({ arrayBuffer: buf });
+    return String(r.value || "").slice(0, 15000);
+  }
+  throw new Error("unsupported");
+}
+
+/* ============================================================
+   SETUP
+   ============================================================ */
+function renderSetup() {
+  applyI18n();
+  const drop = $("#cvDrop");
+  if (drop) drop.style.display = fileSupport ? "" : "none";
+  updateGenEnabled();
+}
+function updateGenEnabled() {
+  const btn = $("#genBtn");
+  if (btn) btn.disabled = !$("#jobInput").value.trim();
+}
+function bindSetupOnce() {
+  if (bindSetupOnce._done) return; bindSetupOnce._done = true;
+  $("#jobInput").addEventListener("input", updateGenEnabled);
+  const file = $("#cvFile"), drop = $("#cvDrop"), msg = $("#cvFileMsg");
+  drop.addEventListener("click", () => file.click());
+  drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); if (e.dataTransfer.files[0]) handleCvFile(e.dataTransfer.files[0]); });
+  file.addEventListener("change", () => { if (file.files[0]) handleCvFile(file.files[0]); });
+  $("#genBtn").addEventListener("click", runGeneration);
+}
+async function handleCvFile(f) {
+  const msg = $("#cvFileMsg");
+  msg.textContent = t("setup_cv_parsing");
+  try {
+    const text = await extractFileText(f);
+    const cur = $("#cvInput").value.trim();
+    $("#cvInput").value = cur ? cur + "\n\n" + text : text;
+    msg.textContent = t("setup_cv_parsed", { file: f.name });
+  } catch (e) {
+    if (String(e.message).includes("load failed") || e.name === "TypeError") { fileSupport = false; $("#cvDrop").style.display = "none"; msg.textContent = t("setup_cv_nofile"); }
+    else msg.textContent = t("setup_cv_parsefail");
+  }
+}
+
+const GEN_ENDPOINT = () => aiBase() + "/api/generate";
+let genStatusTimer = null;
+
+async function runGeneration() {
+  const btn = $("#genBtn"), msg = $("#setupMsg");
+  msg.className = "setup-msg"; msg.textContent = "";
+
+  // TODO(task-8/9): remove guards once bank store + quota land
+  const cap = (typeof checkGenQuota === "function") ? checkGenQuota() : { ok: true };
+  if (!cap.ok) { msg.className = "setup-msg err"; msg.textContent = t("setup_limit_reached", { n: cap.limit }); return; }
+
+  const payload = {
+    jobDescription: $("#jobInput").value.trim(),
+    cv: $("#cvInput").value.trim() || undefined,
+    githubUser: $("#ghInput").value.trim() || undefined,
+    projectsText: $("#projInput").value.trim() || undefined,
+    language: lang,
+    count: Number($("#countSel").value),
+    userKey: (typeof userKey === "function" ? userKey() : "") || undefined,
+  };
+
+  btn.disabled = true;
+  const orig = btn.textContent;
+  let step = 1; btn.textContent = t("setup_generating");
+  msg.textContent = t("setup_gen_status_1");
+  genStatusTimer = setInterval(() => { step = step % 4 + 1; msg.textContent = t("setup_gen_status_" + step); }, 2500);
+
+  try {
+    const r = await fetch(GEN_ENDPOINT(), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !Array.isArray(j.topics)) {
+      const detail = j.detail || j.error || ("HTTP " + r.status);
+      throw new Error(detail);
+    }
+    if (typeof bumpGenQuota === "function") bumpGenQuota();          // Task 9
+    // TODO(task-8/9): remove guards once bank store + quota land
+    if (typeof addBank !== "function") { console.warn("addBank not yet available"); return; }
+    const bank = addBank({                                          // Task 8
+      title: payload.jobDescription.slice(0, 48),
+      lang: payload.language,
+      topics: j.topics,
+      sourceHint: payload.githubUser ? "github:" + payload.githubUser : "job",
+    });
+    setActiveBank(bank.id);                                         // Task 8
+    buildTopicsFromActive();                                        // Task 8
+    renderHome(); show("s-home");
+  } catch (e) {
+    msg.className = "setup-msg err";
+    msg.textContent = t("setup_error", { detail: String(e.message).slice(0, 200) });
+    if (typeof banksList === "function" && !banksList().length && typeof showDemoOffer === "function") showDemoOffer();  // Task 8
+  } finally {
+    clearInterval(genStatusTimer);
+    btn.disabled = false; btn.textContent = orig;
+  }
+}
+
+window.__setup = () => { renderSetup(); bindSetupOnce(); show("s-setup"); };  // TODO(task-8): remove
 
 /* ============================================================
    EVENTOS
