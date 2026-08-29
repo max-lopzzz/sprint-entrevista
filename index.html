@@ -87,6 +87,7 @@
     display:grid;place-items:center;
   }
   .icon-btn:hover{color:var(--ink);border-color:var(--line-strong)}
+  #langToggle{width:auto;padding:0 10px;font-family:"IBM Plex Mono",monospace;font-size:.76rem;font-weight:600;letter-spacing:.04em}
 
   /* ---------- Screens ---------- */
   .screen{display:none;animation:rise .28s ease}
@@ -292,10 +293,11 @@
 <div class="wrap">
 
   <div class="hud">
-    <span class="brand"><span class="dot"></span>Sprint de Entrevista</span>
+    <span class="brand"><span class="dot"></span><span data-i18n="brand">Sprint de Entrevista</span></span>
     <span class="lvl" id="hudLvl">Nv 1</span>
     <span class="xp-track"><span class="xp-fill" id="hudXp"></span></span>
     <span class="stat" id="hudXpNum">0 XP</span>
+    <button class="icon-btn" id="langToggle" title="ES / EN">EN</button>
     <button class="icon-btn" id="muteBtn" title="Silenciar sonido">♪</button>
     <button class="icon-btn" id="resetBtn" title="Reiniciar progreso">⟲</button>
   </div>
@@ -311,33 +313,33 @@
     <div class="modes">
       <button class="mode" data-go="practice">
         <div class="m-ico">🎯</div>
-        <h3>Práctica por tema</h3>
-        <p>Elige un mazo y responde con explicación inmediata. 3 vidas por ronda.</p>
+        <h3 data-i18n="mode_practice_t">Práctica por tema</h3>
+        <p data-i18n="mode_practice_d">Elige un mazo y responde con explicación inmediata. 3 vidas por ronda.</p>
       </button>
       <button class="mode" data-go="flash">
         <div class="m-ico">🃏</div>
-        <h3>Flashcards</h3>
-        <p>Repaso rápido pregunta → concepto. Ideal para la última hora.</p>
+        <h3 data-i18n="mode_flash_t">Flashcards</h3>
+        <p data-i18n="mode_flash_d">Repaso rápido pregunta → concepto. Ideal para la última hora.</p>
       </button>
       <button class="mode" data-go="mock">
         <div class="m-ico">⏱️</div>
-        <h3>Entrevista simulada</h3>
-        <p>15 preguntas mezcladas, 10 min, sin pistas. Reporte al final.</p>
+        <h3 data-i18n="mode_mock_t">Entrevista simulada</h3>
+        <p data-i18n="mode_mock_d">15 preguntas mezcladas, 10 min, sin pistas. Reporte al final.</p>
       </button>
       <button class="mode" data-go="open">
         <div class="m-ico">💬</div>
-        <h3>Respuesta abierta</h3>
-        <p>Contestas con tus palabras, sin ver opciones. Una IA te califica y explica.</p>
+        <h3 data-i18n="mode_open_t">Respuesta abierta</h3>
+        <p data-i18n="mode_open_d">Contestas con tus palabras, sin ver opciones. Una IA te califica y explica.</p>
       </button>
       <button class="mode" data-go="teach">
         <div class="m-ico">🧑‍🏫</div>
-        <h3>Enséñale a la IA</h3>
-        <p>Explicas el concepto como si dieras clase. La IA hace de alumno y evalúa tu explicación.</p>
+        <h3 data-i18n="mode_teach_t">Enséñale a la IA</h3>
+        <p data-i18n="mode_teach_d">Explicas el concepto como si dieras clase. La IA hace de alumno y evalúa tu explicación.</p>
       </button>
     </div>
 
     <div class="section-label">
-      <h2>Dominio por tema</h2>
+      <h2 data-i18n="home_mastery">Dominio por tema</h2>
       <span id="overallProg">0 / 0</span>
     </div>
     <div class="topics" id="topicGrid"></div>
@@ -354,21 +356,21 @@
         <li><b>STAR:</b> Situación → Tarea → Acción → Resultado. Cierra siempre con un resultado medible y un aprendizaje.</li>
       </ul>
     </div>
-    <p class="foot-note">Tu progreso se guarda solo en este navegador. Mucho éxito. 🚀</p>
+    <p class="foot-note" data-i18n="home_foot">Tu progreso se guarda solo en este navegador. Mucho éxito. 🚀</p>
   </section>
 
   <!-- ================= PICKER ================= -->
   <section class="screen" id="s-picker">
-    <button class="btn ghost back" data-home>← Inicio</button>
-    <p class="eyebrow" id="pickerKicker">Práctica</p>
-    <h1 id="pickerTitle" style="font-size:1.7rem;font-weight:800;margin:.3rem 0 .2rem">Elige un tema</h1>
-    <p class="lede" id="pickerSub">Cada ronda te da 3 vidas. Falla y pierdes una; llega a cero y termina la ronda.</p>
+    <button class="btn ghost back" data-home data-i18n="back_home">← Inicio</button>
+    <p class="eyebrow" id="pickerKicker" data-i18n="mode_practice_t">Práctica</p>
+    <h1 id="pickerTitle" data-i18n="picker_practice_title" style="font-size:1.7rem;font-weight:800;margin:.3rem 0 .2rem">Elige un tema</h1>
+    <p class="lede" id="pickerSub" data-i18n="picker_practice_sub">Cada ronda te da 3 vidas. Falla y pierdes una; llega a cero y termina la ronda.</p>
     <div class="chips" id="pickerChips"></div>
   </section>
 
   <!-- ================= QUIZ ================= -->
   <section class="screen" id="s-quiz">
-    <button class="btn ghost back" data-home>← Salir</button>
+    <button class="btn ghost back" data-home data-i18n="back_exit">← Salir</button>
     <div class="q-head">
       <span class="q-progress"><i id="qProg"></i></span>
       <span class="streak" id="qStreak"></span>
@@ -389,13 +391,13 @@
 
   <!-- ================= FLASHCARDS ================= -->
   <section class="screen" id="s-flash">
-    <button class="btn ghost back" data-home>← Salir</button>
+    <button class="btn ghost back" data-home data-i18n="back_exit">← Salir</button>
     <div class="q-head">
       <span class="q-progress"><i id="fcProg"></i></span>
       <span class="stat mono" id="fcCount" style="color:var(--faint);font-size:.8rem"></span>
     </div>
     <div class="card fc" id="fcCard">
-      <div class="face-label" id="fcLabel">Pregunta</div>
+      <div class="face-label" id="fcLabel" data-i18n="fc_face_q">Pregunta</div>
       <div class="face-text" id="fcText"></div>
       <div id="fcCodeWrap"></div>
     </div>
@@ -404,7 +406,7 @@
 
   <!-- ================= RESPUESTA ABIERTA ================= -->
   <section class="screen" id="s-open">
-    <button class="btn ghost back" data-home>← Salir</button>
+    <button class="btn ghost back" data-home data-i18n="back_exit">← Salir</button>
     <div class="q-head">
       <span class="q-progress"><i id="oaProg"></i></span>
       <span class="stat mono" id="oaCount" style="color:var(--faint);font-size:.8rem"></span>
@@ -412,20 +414,20 @@
     <div class="card">
       <div class="oa-sub">
         <div class="q-topic" id="oaTopic"></div>
-        <button class="link-btn" id="oaCfgBtn">⚙︎ IA</button>
+        <button class="link-btn" id="oaCfgBtn" data-i18n="oa_ai_cfg">⚙︎ IA</button>
       </div>
       <div class="ai-cfg" id="oaCfg">
-        <label>URL de tu backend (deploy en Vercel) — para usar la IA fuera de esa URL</label>
+        <label data-i18n="oa_cfg_url_label">URL de tu backend (deploy en Vercel) — para usar la IA fuera de esa URL</label>
         <input id="oaCfgInput" type="url" placeholder="https://sprint-entrevista.vercel.app" autocomplete="off" spellcheck="false">
-        <button class="btn" id="oaCfgSave">Guardar</button>
+        <button class="btn" id="oaCfgSave" data-i18n="oa_cfg_save">Guardar</button>
         <span class="hint">Se guarda solo en este navegador. Si lo dejas vacío, se usa <code>/api/grade</code> del mismo sitio.</span>
       </div>
       <div class="oa-q" id="oaQ"></div>
       <div id="oaCodeWrap"></div>
       <div class="chat" id="oaChat"></div>
       <div class="oa-input" id="oaInputRow">
-        <textarea id="oaText" rows="1" placeholder="Escribe tu respuesta…"></textarea>
-        <button class="btn primary" id="oaSend">Responder</button>
+        <textarea id="oaText" rows="1" data-i18n-ph="oa_answer_ph" placeholder="Escribe tu respuesta…"></textarea>
+        <button class="btn primary" id="oaSend" data-i18n="oa_send_answer">Responder</button>
       </div>
       <div class="oa-actions" id="oaActions"></div>
       <div class="oa-hint" id="oaHint"></div>
@@ -434,21 +436,21 @@
 
   <!-- ================= RESULTS ================= -->
   <section class="screen" id="s-result">
-    <p class="eyebrow" id="rKicker">Resultado</p>
+    <p class="eyebrow" id="rKicker" data-i18n="result_kicker_practice">Resultado</p>
     <div class="result-score" id="rScore"></div>
     <p class="lede" id="rMsg"></p>
     <div class="result-grid" id="rGrid"></div>
     <div id="rBreakdownWrap" style="display:none">
-      <div class="section-label"><h2>Por tema</h2><span></span></div>
+      <div class="section-label"><h2 data-i18n="result_by_topic">Por tema</h2><span></span></div>
       <div class="breakdown" id="rBreakdown"></div>
     </div>
     <div id="rReviewWrap" style="display:none">
-      <div class="section-label"><h2>Para repasar</h2><span id="rReviewCount"></span></div>
+      <div class="section-label"><h2 data-i18n="result_to_review">Para repasar</h2><span id="rReviewCount"></span></div>
       <div class="review" id="rReview"></div>
     </div>
     <div class="cta-row" style="margin-top:22px">
-      <button class="btn primary" id="rAgain">Otra ronda</button>
-      <button class="btn" data-home>Inicio</button>
+      <button class="btn primary" id="rAgain" data-i18n="result_again">Otra ronda</button>
+      <button class="btn" data-home data-i18n="result_home">Inicio</button>
     </div>
   </section>
 
@@ -457,6 +459,190 @@
 <div class="toast" id="toast"></div>
 
 <script>
+/* ============================================================
+   I18N
+   ============================================================ */
+const STR = {
+  es: {
+    brand: "Sprint de Entrevista",
+    nav_lang: "EN",
+    support_kofi: "Invítame un café",
+    // HUD / common
+    level: "Nv", xp: "XP", mute: "Silenciar sonido", reset: "Reiniciar progreso",
+    back_home: "← Inicio", back_exit: "← Salir", next: "Siguiente →", finish_see: "Ver resultado",
+    // Home
+    home_new_interview: "Nueva entrevista",
+    home_switch_bank: "Cambiar banco",
+    home_bank_lang_note: "Este banco está en {lang}.",
+    home_mastery: "Dominio por tema",
+    home_foot: "Tu progreso se guarda solo en este navegador.",
+    // Modes
+    mode_practice_t: "Práctica por tema", mode_practice_d: "Elige un tema y responde con explicación inmediata. 3 vidas por ronda.",
+    mode_flash_t: "Flashcards", mode_flash_d: "Repaso rápido pregunta → concepto.",
+    mode_mock_t: "Entrevista simulada", mode_mock_d: "Preguntas mezcladas, 10 min, sin pistas. Reporte al final.",
+    mode_open_t: "Respuesta abierta", mode_open_d: "Contestas con tus palabras, sin ver opciones. Una IA te califica y explica.",
+    mode_teach_t: "Enséñale a la IA", mode_teach_d: "Explicas el concepto como si dieras clase. La IA hace de alumno y evalúa.",
+    // Picker
+    picker_practice_title: "Elige un tema", picker_practice_sub: "Cada ronda te da 3 vidas. Falla y pierdes una; llega a cero y termina la ronda.",
+    picker_flash_title: "¿Qué quieres repasar?", picker_flash_sub: "Mira la pregunta, intenta responder mentalmente y voltea la tarjeta.",
+    picker_open_title: "¿Sobre qué tema quieres que te pregunten?", picker_open_sub: "Verás solo la pregunta. Responde con tus palabras (o di \"no sé\") y la IA te califica. Puedes repreguntar.",
+    picker_teach_title: "¿Qué tema quieres enseñar?", picker_teach_sub: "Se te da un concepto y se lo explicas a la IA como si dieras clase.",
+    picker_all: "Todos los temas",
+    // Quiz
+    quiz_correct: "Correcto", quiz_wrong: "Incorrecto",
+    lives: "Vidas", streak: "Racha",
+    // Flashcards
+    fc_face_q: "Pregunta", fc_face_a: "Respuesta", fc_knew: "La sabía", fc_review: "Repasar",
+    // Open answer / teach
+    oa_answer_ph: "Escribe tu respuesta…", oa_explain_ph: "Explica el concepto con tus palabras…",
+    oa_send_answer: "Responder", oa_send_explain: "Explicar", oa_send_more: "Enviar",
+    oa_followup_ph: "Pregunta lo que quieras sobre esto… o pulsa Siguiente",
+    oa_idk: "No sé",
+    oa_ai_cfg: "⚙︎ IA",
+    oa_cfg_url_label: "URL de tu backend (deploy en Vercel) — para usar la IA fuera de esa URL",
+    oa_cfg_key_label: "API key propia (opcional) — se guarda solo en este navegador",
+    oa_cfg_save: "Guardar", oa_cfg_saved: "Guardado", oa_cfg_cleared: "Borrado",
+    oa_teach_intro: "Explica el concepto con tus palabras, como si dieras clase. La IA hará de alumno: te preguntará si algo no queda claro y al final evaluará tu explicación.",
+    verdict_correcto: "CORRECTO", verdict_parcial: "PARCIAL", verdict_incorrecto: "INCORRECTO",
+    ref_answer: "Respuesta correcta:", ref_reference: "Referencia:",
+    oa_reveal_self: "Te muestro la respuesta modelo para que te autoevalúes.",
+    oa_reveal_self_teach: "Te muestro la explicación de referencia para que compares con la tuya.",
+    provider_detail: "Detalle del proveedor: {detail}",
+    // Results
+    result_kicker_practice: "Resultado", result_kicker_mock: "Entrevista simulada",
+    result_kicker_open: "Respuesta abierta", result_kicker_teach: "Enséñale a la IA",
+    result_again: "Otra ronda", result_home: "Inicio",
+    result_by_topic: "Por tema", result_to_review: "Para repasar",
+    r_correct: "Correctas", r_partial: "Parciales", r_xp: "XP ganada", r_time: "Tiempo", r_best: "Mejor",
+    // Setup
+    setup_title: "Crea tu banco de preguntas",
+    setup_sub: "Pega la descripción del empleo. Opcionalmente añade tu CV y tus proyectos: las preguntas se adaptan a ti.",
+    setup_job_label: "Descripción del empleo",
+    setup_job_ph: "Pega aquí la vacante: responsabilidades, requisitos, tecnologías…",
+    setup_cv_label: "CV (opcional)",
+    setup_cv_ph: "Pega el texto de tu CV, o suelta un archivo .pdf / .docx / .txt aquí.",
+    setup_cv_drop: "Soltar archivo o hacer clic",
+    setup_cv_parsing: "Leyendo archivo…",
+    setup_cv_parsed: "Texto extraído de {file} — revísalo y edítalo si hace falta.",
+    setup_cv_parsefail: "No se pudo leer el archivo. Pega el texto a mano.",
+    setup_cv_nofile: "La lectura de archivos no está disponible aquí. Pega el texto del CV.",
+    setup_projects_label: "Proyectos (opcional)",
+    setup_gh_ph: "Usuario de GitHub (p. ej. tu-usuario)",
+    setup_projects_ph: "O describe tus proyectos: qué son, con qué los hiciste, tu rol.",
+    setup_count_label: "Número de preguntas",
+    setup_generate: "Generar preguntas",
+    setup_generating: "Generando tu banco…",
+    setup_gen_status_1: "Leyendo la vacante…",
+    setup_gen_status_2: "Revisando tu CV y proyectos…",
+    setup_gen_status_3: "Redactando preguntas…",
+    setup_gen_status_4: "Puliendo opciones y explicaciones…",
+    setup_limit_reached: "Llegaste al límite de {n} generaciones por hoy en este navegador. Añade tu propia API key en ⚙︎ IA para seguir sin límite.",
+    setup_need_backend: "Configura la URL del backend en ⚙︎ IA (o abre la versión de Vercel) para generar preguntas.",
+    setup_error: "No se pudo generar: {detail}",
+    setup_load_demo: "Cargar ejemplo",
+    setup_demo_loaded: "Banco de ejemplo cargado.",
+    lang_es: "español", lang_en: "inglés",
+  },
+  en: {
+    brand: "Interview Sprint",
+    nav_lang: "ES",
+    support_kofi: "Buy me a coffee",
+    level: "Lv", xp: "XP", mute: "Mute sound", reset: "Reset progress",
+    back_home: "← Home", back_exit: "← Exit", next: "Next →", finish_see: "See results",
+    home_new_interview: "New interview",
+    home_switch_bank: "Switch bank",
+    home_bank_lang_note: "This bank is in {lang}.",
+    home_mastery: "Mastery by topic",
+    home_foot: "Your progress is saved only in this browser.",
+    mode_practice_t: "Practice by topic", mode_practice_d: "Pick a topic and answer with instant explanations. 3 lives per round.",
+    mode_flash_t: "Flashcards", mode_flash_d: "Fast review: question → concept.",
+    mode_mock_t: "Mock interview", mode_mock_d: "Mixed questions, 10 min, no hints. Report at the end.",
+    mode_open_t: "Open answer", mode_open_d: "Answer in your own words, no options shown. An AI grades and explains.",
+    mode_teach_t: "Teach the AI", mode_teach_d: "Explain the concept as if teaching a class. The AI plays student and evaluates.",
+    picker_practice_title: "Pick a topic", picker_practice_sub: "Each round gives you 3 lives. Miss one and you lose a life; hit zero and the round ends.",
+    picker_flash_title: "What do you want to review?", picker_flash_sub: "Read the question, answer in your head, then flip the card.",
+    picker_open_title: "What topic should we quiz you on?", picker_open_sub: "You'll see only the question. Answer in your own words (or say \"I don't know\") and the AI grades it. You can ask follow-ups.",
+    picker_teach_title: "What topic do you want to teach?", picker_teach_sub: "You're given a concept and you explain it to the AI as if teaching a class.",
+    picker_all: "All topics",
+    quiz_correct: "Correct", quiz_wrong: "Incorrect",
+    lives: "Lives", streak: "Streak",
+    fc_face_q: "Question", fc_face_a: "Answer", fc_knew: "I knew it", fc_review: "Review",
+    oa_answer_ph: "Type your answer…", oa_explain_ph: "Explain the concept in your own words…",
+    oa_send_answer: "Answer", oa_send_explain: "Explain", oa_send_more: "Send",
+    oa_followup_ph: "Ask anything about this… or press Next",
+    oa_idk: "I don't know",
+    oa_ai_cfg: "⚙︎ AI",
+    oa_cfg_url_label: "Your backend URL (Vercel deploy) — to use the AI outside that URL",
+    oa_cfg_key_label: "Your own API key (optional) — stored only in this browser",
+    oa_cfg_save: "Save", oa_cfg_saved: "Saved", oa_cfg_cleared: "Cleared",
+    oa_teach_intro: "Explain the concept in your own words, as if teaching a class. The AI will play student: it asks when something is unclear and evaluates your explanation at the end.",
+    verdict_correcto: "CORRECT", verdict_parcial: "PARTIAL", verdict_incorrecto: "INCORRECT",
+    ref_answer: "Correct answer:", ref_reference: "Reference:",
+    oa_reveal_self: "Here's the model answer so you can self-assess.",
+    oa_reveal_self_teach: "Here's the reference explanation to compare with yours.",
+    provider_detail: "Provider detail: {detail}",
+    result_kicker_practice: "Result", result_kicker_mock: "Mock interview",
+    result_kicker_open: "Open answer", result_kicker_teach: "Teach the AI",
+    result_again: "Another round", result_home: "Home",
+    result_by_topic: "By topic", result_to_review: "To review",
+    r_correct: "Correct", r_partial: "Partial", r_xp: "XP earned", r_time: "Time", r_best: "Best",
+    setup_title: "Build your question bank",
+    setup_sub: "Paste the job description. Optionally add your CV and projects — the questions adapt to you.",
+    setup_job_label: "Job description",
+    setup_job_ph: "Paste the posting: responsibilities, requirements, technologies…",
+    setup_cv_label: "CV (optional)",
+    setup_cv_ph: "Paste your CV text, or drop a .pdf / .docx / .txt file here.",
+    setup_cv_drop: "Drop a file or click",
+    setup_cv_parsing: "Reading file…",
+    setup_cv_parsed: "Text extracted from {file} — review and edit if needed.",
+    setup_cv_parsefail: "Couldn't read the file. Paste the text manually.",
+    setup_cv_nofile: "File reading isn't available here. Paste your CV text.",
+    setup_projects_label: "Projects (optional)",
+    setup_gh_ph: "GitHub username (e.g. your-handle)",
+    setup_projects_ph: "Or describe your projects: what they are, what you built them with, your role.",
+    setup_count_label: "Number of questions",
+    setup_generate: "Generate questions",
+    setup_generating: "Building your bank…",
+    setup_gen_status_1: "Reading the posting…",
+    setup_gen_status_2: "Reviewing your CV and projects…",
+    setup_gen_status_3: "Writing questions…",
+    setup_gen_status_4: "Polishing options and explanations…",
+    setup_limit_reached: "You've hit the limit of {n} generations today in this browser. Add your own API key in ⚙︎ AI to continue without limits.",
+    setup_need_backend: "Set the backend URL in ⚙︎ AI (or open the Vercel version) to generate questions.",
+    setup_error: "Couldn't generate: {detail}",
+    setup_load_demo: "Load example",
+    setup_demo_loaded: "Example bank loaded.",
+    lang_es: "Spanish", lang_en: "English",
+  },
+};
+
+let lang = (() => {
+  try { const v = localStorage.getItem("sprint-lang"); if (v === "es" || v === "en") return v; } catch (e) {}
+  return (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+})();
+
+function t(key, vars) {
+  let s = (STR[lang] && STR[lang][key]) ?? STR.es[key] ?? key;
+  if (vars) for (const k in vars) s = s.replace(new RegExp("\\{" + k + "\\}", "g"), vars[k]);
+  return s;
+}
+
+function applyI18n() {
+  document.documentElement.setAttribute("lang", lang);
+  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.setAttribute("placeholder", t(el.dataset.i18nPh)); });
+  const tg = document.getElementById("langToggle");
+  if (tg) tg.textContent = t("nav_lang");
+}
+
+function setLang(next) {
+  lang = next === "en" ? "en" : "es";
+  try { localStorage.setItem("sprint-lang", lang); } catch (e) {}
+  applyI18n();
+  if (typeof renderHud === "function") renderHud();
+  if (typeof rerenderCurrent === "function") rerenderCurrent();
+}
+
 /* ============================================================
    CONTENIDO
    Cada pregunta: { q, code?, opts:[...], a: índice correcto, ex }
@@ -677,10 +863,17 @@ function toast(msg){
   clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove("show"), 1600);
 }
 
+let currentScreen = "s-home";
 function show(id){
+  currentScreen = id;
   $$(".screen").forEach(s=>s.classList.remove("active"));
   $("#"+id).classList.add("active");
   window.scrollTo({top:0, behavior:"instant"});
+}
+function rerenderCurrent(){
+  if (currentScreen === "s-home") renderHome();
+  else if (currentScreen === "s-setup" && typeof renderSetup === "function") renderSetup();
+  // other screens are transient; re-render on next entry
 }
 
 /* ============================================================
@@ -688,9 +881,9 @@ function show(id){
    ============================================================ */
 function renderHud(){
   const li = levelInfo(state.xp);
-  $("#hudLvl").textContent = "Nv " + li.lvl;
+  $("#hudLvl").textContent = t("level") + " " + li.lvl;
   $("#hudXp").style.width = li.pct + "%";
-  $("#hudXpNum").textContent = state.xp + " XP";
+  $("#hudXpNum").textContent = state.xp + " " + t("xp");
   $("#muteBtn").textContent = state.muted ? "🔇" : "♪";
 }
 
@@ -728,9 +921,9 @@ function openPicker(mode){
   const chips = $("#pickerChips");
   chips.innerHTML = "";
   if(mode === "practice"){
-    $("#pickerKicker").textContent = "Práctica por tema";
-    $("#pickerTitle").textContent = "Elige un tema";
-    $("#pickerSub").textContent = "Cada ronda te da 3 vidas. Falla y pierdes una; llega a cero y termina la ronda.";
+    $("#pickerKicker").textContent = t("mode_practice_t");
+    $("#pickerTitle").textContent = t("picker_practice_title");
+    $("#pickerSub").textContent = t("picker_practice_sub");
     TOPICS.forEach(t=>{
       const c = document.createElement("button");
       c.className = "chip"; c.style.setProperty("--tc", t.color);
@@ -740,11 +933,11 @@ function openPicker(mode){
       chips.appendChild(c);
     });
   } else if(mode === "flash"){
-    $("#pickerKicker").textContent = "Flashcards";
-    $("#pickerTitle").textContent = "¿Qué quieres repasar?";
-    $("#pickerSub").textContent = "Mira la pregunta, intenta responder mentalmente y voltea la tarjeta.";
+    $("#pickerKicker").textContent = t("mode_flash_t");
+    $("#pickerTitle").textContent = t("picker_flash_title");
+    $("#pickerSub").textContent = t("picker_flash_sub");
     const all = document.createElement("button");
-    all.className = "chip"; all.textContent = "Todos los temas";
+    all.className = "chip"; all.textContent = t("picker_all");
     all.addEventListener("click", ()=>startFlash("all"));
     chips.appendChild(all);
     TOPICS.forEach(t=>{
@@ -756,13 +949,11 @@ function openPicker(mode){
     });
   } else if(mode === "open" || mode === "teach"){
     const teach = mode === "teach";
-    $("#pickerKicker").textContent = teach ? "Enséñale a la IA" : "Respuesta abierta";
-    $("#pickerTitle").textContent = teach ? "¿Qué tema quieres enseñar?" : "¿Sobre qué tema quieres que te pregunten?";
-    $("#pickerSub").textContent = teach
-      ? "Se te da un concepto y se lo explicas a la IA como si dieras clase. Ella hace de alumno, te pregunta y evalúa tu explicación."
-      : "Verás solo la pregunta. Responde con tus palabras (o di \"no sé\") y la IA te califica y te explica. Puedes repreguntar.";
+    $("#pickerKicker").textContent = teach ? t("mode_teach_t") : t("mode_open_t");
+    $("#pickerTitle").textContent = teach ? t("picker_teach_title") : t("picker_open_title");
+    $("#pickerSub").textContent = teach ? t("picker_teach_sub") : t("picker_open_sub");
     const all = document.createElement("button");
-    all.className = "chip"; all.textContent = "Todos los temas";
+    all.className = "chip"; all.textContent = t("picker_all");
     all.addEventListener("click", ()=>startOpen("all", mode));
     chips.appendChild(all);
     TOPICS.forEach(t=>{
@@ -879,7 +1070,7 @@ function choose(i){
     const ex = $("#qExplain");
     ex.className = "explain show";
     $("#qVerdict").className = "verdict " + (isCorrect ? "ok" : "no");
-    $("#qVerdict").textContent = isCorrect ? "Correcto" : "Incorrecto";
+    $("#qVerdict").textContent = isCorrect ? t("quiz_correct") : t("quiz_wrong");
     $("#qExplainText").textContent = it.q.ex;
 
     if(isCorrect){
@@ -902,7 +1093,7 @@ function choose(i){
     const nb = document.createElement("button");
     nb.className = "btn primary";
     const last = quiz.idx >= quiz.items.length - 1 || quiz.lives <= 0;
-    nb.textContent = last ? "Ver resultado" : "Siguiente →";
+    nb.textContent = last ? t("finish_see") : t("next");
     nb.addEventListener("click", advance);
     foot.appendChild(nb);
   } else {
@@ -954,7 +1145,7 @@ function renderFc(){
   fc.flipped = false;
   $("#fcProg").style.width = (fc.idx/fc.items.length*100) + "%";
   $("#fcCount").textContent = (fc.idx+1) + " / " + fc.items.length;
-  $("#fcLabel").textContent = topicById(it.tid).name + "  ·  pregunta";
+  $("#fcLabel").textContent = topicById(it.tid).name + "  ·  " + t("fc_face_q");
   $("#fcText").className = "face-text";
   $("#fcText").textContent = it.q.q;
   const cw = $("#fcCodeWrap"); cw.innerHTML = "";
@@ -972,17 +1163,17 @@ function flipFc(){
   const it = fc.items[fc.idx];
   if(!fc.flipped){
     fc.flipped = true;
-    $("#fcLabel").textContent = "respuesta";
+    $("#fcLabel").textContent = t("fc_face_a");
     const correct = it.q.opts[it.q.a];
     $("#fcCodeWrap").innerHTML = "";
     $("#fcText").className = "face-text";
     $("#fcText").innerHTML = `<span style="color:var(--good)">${esc(correct)}</span><br><span class="face-text small" style="display:inline-block;margin-top:10px">${esc(it.q.ex)}</span>`;
     const act = $("#fcActions"); act.innerHTML = "";
     const no = document.createElement("button");
-    no.className = "btn"; no.textContent = "Repasar";
+    no.className = "btn"; no.textContent = t("fc_review");
     no.addEventListener("click", ()=>nextFc(false));
     const yes = document.createElement("button");
-    yes.className = "btn primary"; yes.textContent = "La sabía";
+    yes.className = "btn primary"; yes.textContent = t("fc_knew");
     yes.addEventListener("click", ()=>nextFc(true));
     act.appendChild(no); act.appendChild(yes);
   }
@@ -994,9 +1185,9 @@ function nextFc(knew){
   if(fc.idx >= fc.items.length){
     saveState();
     showResult({
-      kicker:"Flashcards", scoreText: fc.knew + "/" + fc.items.length,
+      kicker:t("mode_flash_t"), scoreText: fc.knew + "/" + fc.items.length,
       msg: fc.knew === fc.items.length ? "Impecable. Tienes el material fresco." : "Vuelve a correr las que marcaste como 'Repasar' hasta que fluyan.",
-      grid:[["Tarjetas", fc.items.length],["\"La sabía\"", fc.knew],["XP ganada", fc.knew*4]],
+      grid:[["Tarjetas", fc.items.length],["\"" + t("fc_knew") + "\"", fc.knew],[t("r_xp"), fc.knew*4]],
       againLabel:"Repasar de nuevo", again:()=>startFlash(fc.scope)
     });
     return;
@@ -1044,14 +1235,14 @@ function finishQuiz(){
     }).filter(Boolean);
 
     showResult({
-      kicker:"Entrevista simulada",
+      kicker:t("result_kicker_mock"),
       scoreText: quiz.correct + "/" + quiz.items.length,
       msg: pct >= 80 ? "Listo para entrar. Repasa solo lo que salga en rojo abajo."
          : pct >= 60 ? "Vas bien. Enfócate esta noche en los temas más bajos del desglose."
          : "Hay terreno por cubrir. Usa Práctica por tema en los de menor porcentaje y vuelve a simular.",
       grid:[
         ["Puntaje", pct + "%"],
-        ["Tiempo", mm + ":" + String(ss).padStart(2,"0")],
+        [t("r_time"), mm + ":" + String(ss).padStart(2,"0")],
         ["Mejor marca", (state.bestMock||0) + "%" + (isBest ? " ✨" : "")]
       ],
       breakdown,
@@ -1104,7 +1295,7 @@ function showResult(cfg){
   } else rw.style.display = "none";
 
   const again = $("#rAgain");
-  again.textContent = cfg.againLabel || "Otra ronda";
+  again.textContent = cfg.againLabel || t("result_again");
   again.onclick = cfg.again;
 
   renderHome();
@@ -1174,7 +1365,7 @@ function bindOpenOnce(){
     const v = $("#oaCfgInput").value.trim().replace(/\/+$/,"");
     try{ if(v) localStorage.setItem("grade-base", v); else localStorage.removeItem("grade-base"); }catch(e){}
     $("#oaCfg").classList.remove("show");
-    toast(v ? "Backend guardado" : "Backend borrado");
+    toast(v ? t("oa_cfg_saved") : t("oa_cfg_cleared"));
   });
 }
 
@@ -1184,7 +1375,7 @@ function renderOpen(){
   oa.graded = false; oa.history = []; oa.busy = false;
   $("#oaProg").style.width = (oa.idx/oa.items.length*100) + "%";
   $("#oaCount").textContent = (oa.idx+1) + " / " + oa.items.length;
-  $("#oaTopic").textContent = topicById(it.tid).name + (teach ? "  ·  enséñale a la IA" : "  ·  respuesta abierta");
+  $("#oaTopic").textContent = topicById(it.tid).name + "  ·  " + (teach ? t("mode_teach_t") : t("mode_open_t"));
   $("#oaQ").textContent = (teach ? "Explícale a la IA: " : "") + it.q.q;
   const cw = $("#oaCodeWrap"); cw.innerHTML = "";
   if(it.q.code){
@@ -1192,14 +1383,14 @@ function renderOpen(){
     cw.appendChild(pre);
   }
   $("#oaChat").innerHTML = "";
-  if(teach) addBubble("sys", "Explica el concepto con tus palabras, como si dieras clase. La IA hará de alumno: te preguntará si algo no queda claro y al final evaluará tu explicación.");
+  if(teach) addBubble("sys", t("oa_teach_intro"));
   $("#oaActions").innerHTML = "";
   $("#oaHint").textContent = "";
   const ta = $("#oaText");
   ta.value = ""; ta.style.height = "auto"; ta.disabled = false;
-  ta.placeholder = teach ? "Explica el concepto con tus palabras…" : "Escribe tu respuesta…";
+  ta.placeholder = teach ? t("oa_explain_ph") : t("oa_answer_ph");
   $("#oaInputRow").style.display = "";
-  $("#oaSend").disabled = false; $("#oaSend").textContent = teach ? "Explicar" : "Responder";
+  $("#oaSend").disabled = false; $("#oaSend").textContent = teach ? t("oa_send_explain") : t("oa_send_answer");
   try{ $("#oaCfgInput").value = localStorage.getItem("grade-base") || ""; }catch(e){}
   ta.focus();
 }
@@ -1226,7 +1417,7 @@ async function sendOpen(raw){
   const it = oa.items[oa.idx];
   let text = (raw || "").trim();
   const isFirst = !oa.graded;
-  if(isFirst && !text && oa.kind !== "teach") text = "No sé la respuesta.";
+  if(isFirst && !text && oa.kind !== "teach") text = t("oa_idk");
   if(!text) return;
 
   const ta = $("#oaText");
@@ -1265,7 +1456,7 @@ async function sendOpen(raw){
   let body = res.reply, verdict = null;
   const m = res.reply.match(/^\s*VEREDICTO:\s*(CORRECTO|PARCIAL|INCORRECTO)\s*\n?/i);
   if(m){ verdict = m[1].toUpperCase(); body = res.reply.slice(m[0].length); }
-  const chip = verdict ? `<span class="verdict-chip ${verdict.toLowerCase()}">${verdict}</span>` : "";
+  const chip = verdict ? `<span class="verdict-chip ${verdict.toLowerCase()}">${t("verdict_" + verdict.toLowerCase())}</span>` : "";
   addBubble("ai", chip + fmt(body.trim()));
 
   if(isFirst){
@@ -1273,8 +1464,8 @@ async function sendOpen(raw){
     if(verdict === "CORRECTO"){ oa.correct++; oa.xpGain+=15; markMastered(it.tid, it.qi); bumpSeen(it.tid, true); addXp(15); sndOk(); }
     else if(verdict === "PARCIAL"){ oa.partial++; oa.xpGain+=8; bumpSeen(it.tid, true); addXp(8); }
     else { bumpSeen(it.tid, false); sndNo(); }
-    $("#oaSend").textContent = "Enviar";
-    ta.placeholder = "Pregunta lo que quieras sobre esto… o pulsa Siguiente";
+    $("#oaSend").textContent = t("oa_send_more");
+    ta.placeholder = t("oa_followup_ph");
     renderOpenActions();
   }
 }
@@ -1283,7 +1474,7 @@ function renderOpenActions(){
   const a = $("#oaActions"); a.innerHTML = "";
   const next = document.createElement("button");
   next.className = "btn primary";
-  next.textContent = oa.idx >= oa.items.length - 1 ? "Ver resultado" : "Siguiente pregunta →";
+  next.textContent = oa.idx >= oa.items.length - 1 ? t("finish_see") : t("next");
   next.addEventListener("click", advanceOpen);
   a.appendChild(next);
 }
@@ -1310,17 +1501,17 @@ function fallbackReveal(code, detail){
     bad_reply:"Respuesta inválida del backend."
   };
   const teach = oa.kind === "teach";
-  addBubble("sys", (msgs[code] || ("IA no disponible (" + code + ").")) + (teach
-    ? " Te muestro la explicación de referencia para que compares con la tuya."
-    : " Te muestro la respuesta modelo para que te autoevalúes."));
-  if(detail) addBubble("sys", "Detalle del proveedor: " + esc(String(detail).slice(0,240)));
-  addBubble("ai", "<strong>" + (teach ? "Referencia:" : "Respuesta correcta:") + "</strong> " + esc(it.q.opts[it.q.a]) + "<br><br>" + fmt(it.q.ex));
+  addBubble("sys", (msgs[code] || ("IA no disponible (" + code + ").")) + " " + (teach
+    ? t("oa_reveal_self_teach")
+    : t("oa_reveal_self")));
+  if(detail) addBubble("sys", t("provider_detail", { detail: esc(String(detail).slice(0,240)) }));
+  addBubble("ai", "<strong>" + (teach ? t("ref_reference") : t("ref_answer")) + "</strong> " + esc(it.q.opts[it.q.a]) + "<br><br>" + fmt(it.q.ex));
   $("#oaInputRow").style.display = "none";
   const a = $("#oaActions"); a.innerHTML = "";
   if(!oa.graded){
     const mk = (label, cls, fn)=>{ const b=document.createElement("button"); b.className="btn"+(cls?" "+cls:""); b.textContent=label; b.addEventListener("click",fn); return b; };
-    a.appendChild(mk(teach ? "La expliqué bien" : "La sabía", "primary", ()=>{ oa.graded=true; oa.correct++; oa.xpGain+=12; markMastered(it.tid,it.qi); bumpSeen(it.tid,true); addXp(12); renderOpenActions(); }));
-    a.appendChild(mk("A repasar", "", ()=>{ oa.graded=true; bumpSeen(it.tid,false); renderOpenActions(); }));
+    a.appendChild(mk(teach ? "La expliqué bien" : t("fc_knew"), "primary", ()=>{ oa.graded=true; oa.correct++; oa.xpGain+=12; markMastered(it.tid,it.qi); bumpSeen(it.tid,true); addXp(12); renderOpenActions(); }));
+    a.appendChild(mk(t("fc_review"), "", ()=>{ oa.graded=true; bumpSeen(it.tid,false); renderOpenActions(); }));
   } else {
     renderOpenActions();
   }
@@ -1332,7 +1523,7 @@ function finishOpen(){
   const total = oa.items.length;
   const pct = Math.round((oa.correct + oa.partial*0.5)/total*100);
   showResult({
-    kicker: teach ? "Enséñale a la IA" : "Respuesta abierta",
+    kicker: teach ? t("result_kicker_teach") : t("result_kicker_open"),
     scoreText: oa.correct + "/" + total,
     msg: oa.aiDown
       ? "Parte de la sesión fue en autoevaluación (la IA no respondió). Aun así, explicar en voz alta es lo que más fija el concepto."
@@ -1344,11 +1535,11 @@ function finishOpen(){
         : pct >= 50 ? "Vas bien. Repite las parciales enfocándote en ser preciso y concreto."
         : "Sigue practicando en voz alta. Explicar cuesta más que reconocer una opción — por eso funciona."),
     grid:[
-      [teach ? "Bien explicadas" : "Correctas", oa.correct + "/" + total],
-      ["Parciales", oa.partial],
-      ["XP ganada", oa.xpGain]
+      [teach ? "Bien explicadas" : t("r_correct"), oa.correct + "/" + total],
+      [t("r_partial"), oa.partial],
+      [t("r_xp"), oa.xpGain]
     ],
-    againLabel:"Otra ronda", again:()=>startOpen(oa.scope, oa.kind)
+    againLabel:t("result_again"), again:()=>startOpen(oa.scope, oa.kind)
   });
 }
 
@@ -1367,6 +1558,7 @@ $$(".mode").forEach(b=> b.addEventListener("click", ()=>{
   else if(go === "open") openPicker("open");
   else if(go === "teach") openPicker("teach");
 }));
+$("#langToggle").addEventListener("click", ()=> setLang(lang === "es" ? "en" : "es"));
 $("#muteBtn").addEventListener("click", ()=>{
   state.muted = !state.muted; saveState(); renderHud();
   if(!state.muted) sndOk();
@@ -1383,6 +1575,7 @@ $("#fcCard").addEventListener("click", ()=>{ if(fc && !fc.flipped) flipFc(); });
 /* ============================================================
    INIT
    ============================================================ */
+applyI18n();
 renderHud();
 renderHome();
 </script>

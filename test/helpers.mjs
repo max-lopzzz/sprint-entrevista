@@ -32,8 +32,29 @@ export function fakeLocalStorage(seed = {}) {
 export function extractClientHelpers(names, sandbox = {}) {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const script = html.match(/<script>([\s\S]*)<\/script>/)[1];
+  // Forgiving DOM stub: the inline script wires event listeners and does a
+  // first render at top level. We only want to reach `STR`/`t`, so every DOM
+  // access resolves to a chainable, callable no-op proxy.
+  const domStub = new Proxy(function () {}, {
+    get(_t, prop) {
+      if (prop === Symbol.iterator) return undefined;
+      if (prop === Symbol.toPrimitive) return () => "";
+      return domStub;
+    },
+    set() { return true; },
+    apply() { return domStub; },
+  });
+  const document = {
+    documentElement: domStub,
+    body: domStub,
+    addEventListener() {},
+    querySelector() { return domStub; },
+    querySelectorAll() { return []; },
+    getElementById() { return domStub; },
+    createElement() { return domStub; },
+  };
   const ctx = {
-    window: {}, document: { documentElement: {}, addEventListener() {} },
+    window: {}, document,
     navigator: { language: "es-MX" }, localStorage: fakeLocalStorage(),
     console, structuredClone, setTimeout, clearTimeout, fetch: undefined,
     ...sandbox,
