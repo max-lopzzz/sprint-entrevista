@@ -102,7 +102,11 @@
 
   /* home */
   .hero h1{font-size:clamp(1.9rem,6vw,2.9rem);font-weight:800;margin:.3rem 0 .5rem}
-  .hero .accent{color:var(--accent)}
+  .bank-bar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;margin:18px 0 4px}
+  .bank-title{font-size:1.05rem;font-weight:700}
+  .bank-lang-note{font-size:.78rem;color:var(--faint);margin-top:2px}
+  .bank-bar-actions{display:flex;gap:8px;align-items:center}
+  .bank-bar select{padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.85rem;max-width:44vw}
   .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:24px 0 30px}
   .mode{
     text-align:left;cursor:pointer;color:var(--ink);
@@ -136,12 +140,6 @@
   .topic .t-count{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--faint);font-variant-numeric:tabular-nums}
   .bar{height:6px;border-radius:999px;background:var(--surface-3);overflow:hidden}
   .bar > i{display:block;height:100%;width:0;background:var(--tc,var(--accent));border-radius:999px;transition:width .5s ease}
-
-  .tips{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 17px}
-  .tips h3{font-size:.95rem;font-weight:700;margin-bottom:8px}
-  .tips ul{margin:0;padding-left:1.1rem;color:var(--muted);font-size:.86rem}
-  .tips li{margin:4px 0}
-  .tips b{color:var(--ink)}
 
   /* picker */
   .btn{
@@ -359,11 +357,21 @@
   </section>
 
   <!-- ================= HOME ================= -->
-  <section class="screen active" id="s-home">
+  <section class="screen" id="s-home">
     <div class="hero">
-      <p class="eyebrow">Práctica intensiva · entrevista 9:30</p>
-      <h1>Llega listo a la <span class="accent">entrevista técnica</span>.</h1>
-      <p class="lede">Preguntas de conocimiento general sobre Excel, Power Apps, Power BI, Copilot Studio, Python, SQL y JavaScript — más un bloque de CEMEX y comportamiento, y uno sobre tus propios proyectos de GitHub. Responde, gana XP, sube de nivel.</p>
+      <h1 data-i18n="home_hero_title">Practice for your interview</h1>
+      <p class="lede" data-i18n="home_hero_sub">Your question bank, generated from the job description and your profile. Answer, earn XP, level up.</p>
+    </div>
+
+    <div class="bank-bar" id="bankBar">
+      <div class="bank-bar-main">
+        <h2 class="bank-title" id="bankTitle"></h2>
+        <p class="bank-lang-note" id="bankLangNote" style="display:none"></p>
+      </div>
+      <div class="bank-bar-actions">
+        <select id="bankSwitch" style="display:none"></select>
+        <button class="btn ghost" id="newBankBtn"></button>
+      </div>
     </div>
 
     <div class="modes">
@@ -400,18 +408,6 @@
     </div>
     <div class="topics" id="topicGrid"></div>
 
-    <div class="tips">
-      <h3>Repaso exprés antes de entrar</h3>
-      <ul>
-        <li><b>Measure vs calculated column:</b> la <i>measure</i> se evalúa en el contexto del visual (al vuelo); la columna calculada se calcula fila por fila al cargar el modelo.</li>
-        <li><b>Star schema:</b> una tabla de hechos (fact) central con métricas + tablas de dimensión (fecha, producto, planta) que la filtran.</li>
-        <li><b>SQL — orden real:</b> FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. Por eso no puedes usar un alias del SELECT en el WHERE.</li>
-        <li><b>Python:</b> listas mutables, tuplas inmutables; usa <span class="mono">dict.get(k, default)</span> para evitar KeyError.</li>
-        <li><b>JS:</b> <span class="mono">===</span> compara valor y tipo sin convertir; <span class="mono">map/filter</span> devuelven un arreglo nuevo, no mutan.</li>
-        <li><b>Copilot Studio:</b> plataforma low-code de Power Platform para crear agentes/copilots propios con <i>topics</i>, <i>actions</i> y fuentes de conocimiento (grounding).</li>
-        <li><b>STAR:</b> Situación → Tarea → Acción → Resultado. Cierra siempre con un resultado medible y un aprendizaje.</li>
-      </ul>
-    </div>
     <p class="foot-note" data-i18n="home_foot">Tu progreso se guarda solo en este navegador. Mucho éxito. 🚀</p>
   </section>
 
@@ -527,6 +523,8 @@ const STR = {
     level: "Nv", xp: "XP", mute: "Silenciar sonido", reset: "Reiniciar progreso",
     back_home: "← Inicio", back_exit: "← Salir", next: "Siguiente →", finish_see: "Ver resultado",
     // Home
+    home_hero_title: "Practica para tu entrevista",
+    home_hero_sub: "Tu banco de preguntas, generado a partir de la vacante y tu perfil. Responde, gana XP, sube de nivel.",
     home_new_interview: "Nueva entrevista",
     home_switch_bank: "Cambiar banco",
     home_bank_lang_note: "Este banco está en {lang}.",
@@ -650,6 +648,8 @@ const STR = {
     support_kofi: "Buy me a coffee",
     level: "Lv", xp: "XP", mute: "Mute sound", reset: "Reset progress",
     back_home: "← Home", back_exit: "← Exit", next: "Next →", finish_see: "See results",
+    home_hero_title: "Practice for your interview",
+    home_hero_sub: "Your question bank, generated from the job description and your profile. Answer, earn XP, level up.",
     home_new_interview: "New interview",
     home_switch_bank: "Switch bank",
     home_bank_lang_note: "This bank is in {lang}.",
@@ -798,144 +798,97 @@ function setLang(next) {
    CONTENIDO
    Cada pregunta: { q, code?, opts:[...], a: índice correcto, ex }
    ============================================================ */
-const TOPICS = [
-  { id:"excel", name:"Excel", color:"var(--t-excel)", qs:[
-    { q:"¿Qué ventaja tiene XLOOKUP sobre VLOOKUP?", opts:["Es más rápido de escribir pero hace lo mismo","Puede buscar a la izquierda y no depende del número de columna","Solo funciona con tablas dinámicas","Requiere ordenar los datos primero"], a:1, ex:"XLOOKUP busca en cualquier dirección, devuelve por referencia de rango (no por índice de columna) y tiene argumento 'si no se encuentra' integrado." },
-    { q:"¿Para qué sirve la combinación INDEX + MATCH?", opts:["Sumar un rango con condición","Buscar un valor devolviendo una celda ubicada por fila/columna, con más flexibilidad que VLOOKUP","Crear un gráfico dinámico","Quitar duplicados de una columna"], a:1, ex:"MATCH encuentra la posición del valor y INDEX devuelve el contenido de esa posición; permite búsquedas a la izquierda y no se rompe al insertar columnas." },
-    { q:"En SUMIFS, ¿cuál es el orden correcto de argumentos?", code:"=SUMIFS( ? , ? , ? )", opts:["rango_criterio, criterio, rango_suma","rango_suma, rango_criterio1, criterio1","criterio, rango_suma, rango_criterio","rango_suma, criterio1, rango_criterio1"], a:1, ex:"SUMIFS empieza por el rango a sumar y luego pares de (rango_criterio, criterio). SUMIF, en cambio, pone el rango de suma al final." },
-    { q:"¿Qué significa la referencia $A$1?", opts:["Un valor en moneda","Referencia absoluta: no cambia fila ni columna al copiar la fórmula","Referencia a otra hoja","Referencia circular"], a:1, ex:"El signo $ fija la parte que precede. $A$1 fija ambas; A$1 fija solo la fila; $A1 fija solo la columna (referencia mixta)." },
-    { q:"¿Cuál es el propósito principal de una tabla dinámica (PivotTable)?", opts:["Validar entradas de datos","Resumir y agregar grandes volúmenes de datos por categorías sin fórmulas","Proteger celdas con contraseña","Conectarse a una base de datos"], a:1, ex:"Permite agrupar, contar, sumar y promediar arrastrando campos a filas, columnas y valores; es la forma más rápida de explorar datos tabulares." },
-    { q:"¿Qué hace Power Query dentro de Excel?", opts:["Escribe consultas SQL en las celdas","Extrae, transforma y carga datos (limpieza, combinación, tipos) con pasos repetibles","Genera contraseñas","Solo importa archivos CSV"], a:1, ex:"Power Query (Obtener y transformar) es la capa ETL: conecta a fuentes, aplica pasos de limpieza que se pueden refrescar, y carga el resultado a la hoja o al modelo." },
-    { q:"¿Qué devuelve IFERROR(A1/B1, 0) si B1 es 0?", opts:["#¡DIV/0!","0","VERDADERO","Un texto vacío"], a:1, ex:"IFERROR evalúa el primer argumento y, si da cualquier error, devuelve el segundo. Útil para ocultar #N/A o #DIV/0 en reportes." },
-    { q:"¿Cuándo usas COUNTIFS en lugar de COUNTIF?", opts:["Cuando quieres contar celdas vacías","Cuando necesitas contar con varias condiciones a la vez","COUNTIFS no existe","Cuando el rango está en otra hoja"], a:1, ex:"COUNTIF admite una sola condición; COUNTIFS admite múltiples pares rango/criterio que deben cumplirse todos (Y lógico)." },
-    { q:"¿Qué hace TEXTJOIN(\", \", TRUE, A1:A3)?", opts:["Separa un texto en columnas","Une los valores del rango con \", \" como separador, ignorando celdas vacías","Cuenta caracteres","Convierte a mayúsculas"], a:1, ex:"El segundo argumento TRUE indica ignorar vacíos. TEXTJOIN es más flexible que CONCAT porque permite un delimitador y saltar celdas sin dato." },
-    { q:"En una tabla de Excel, ¿qué es una referencia estructurada como Tabla1[Ventas]?", opts:["Un error de sintaxis","Una forma de referirse a la columna 'Ventas' por nombre en vez de por rango de celdas","Una macro","Un gráfico"], a:1, ex:"Las tablas (Ctrl+T) permiten fórmulas legibles que se expanden solas al agregar filas: =SUMA(Tabla1[Ventas]) en lugar de =SUMA(C2:C500)." },
-    { q:"¿Para qué sirve Validación de datos con lista?", opts:["Para crear un menú desplegable que limita lo que se puede capturar en la celda","Para colorear celdas automáticamente","Para bloquear la hoja","Para ordenar de A a Z"], a:0, ex:"Restringe la entrada a valores permitidos, reduce errores de captura y estandariza los datos antes de analizarlos." },
-    { q:"Escribes una fórmula de matriz dinámica y aparece #¡DESBORDAMIENTO! (#SPILL!). ¿Qué pasa?", opts:["La fórmula tiene un error de sintaxis","El rango donde debería 'derramar' los resultados está bloqueado por otro contenido","Falta activar las macros","El archivo está dañado"], a:1, ex:"Las funciones de matriz dinámica (UNIQUE, SORT, FILTER) necesitan celdas vacías para expandirse. Limpia el rango de destino y el resultado se derrama solo." },
-  ]},
+let TOPICS = [];
 
-  { id:"apps", name:"Power Apps", color:"var(--t-apps)", qs:[
-    { q:"¿Diferencia clave entre una app canvas y una model-driven?", opts:["Canvas no usa datos","Canvas: diseñas la interfaz pixel a pixel libremente. Model-driven: la UI se genera a partir del modelo de datos de Dataverse","Model-driven solo corre en móvil","No hay diferencia"], a:1, ex:"Canvas da control total del diseño y conecta a muchas fuentes. Model-driven es orientada a procesos, dirigida por datos y metadatos de Dataverse." },
-    { q:"Ves la advertencia 'la delegación (delegation) puede no funcionar'. ¿Qué significa?", opts:["La app no tiene licencia","La operación no se puede enviar a la fuente de datos, así que Power Apps solo procesa los primeros N registros localmente","Hay un error de sintaxis en Power Fx","El usuario no tiene permisos"], a:1, ex:"Si una función no es delegable, solo se evalúan ~500–2000 registros traídos al cliente. Con tablas grandes hay que reescribir la fórmula con funciones delegables (Filter con operadores simples, etc.)." },
-    { q:"¿Qué hace la función Patch()?", opts:["Repara la app","Crea o modifica uno o varios registros de una fuente de datos","Cambia de pantalla","Aplica un tema visual"], a:1, ex:"Patch(Origen, Registro, Cambios) actualiza un registro existente; con Defaults(Origen) crea uno nuevo. Es la forma flexible de escribir datos sin un formulario." },
-    { q:"¿Para qué se usa ClearCollect()?", opts:["Borra la app","Vacía una colección y la vuelve a llenar con nuevos registros en memoria","Elimina la fuente de datos","Cierra la sesión"], a:1, ex:"Una colección es una tabla temporal en memoria del dispositivo. ClearCollect(colec, origen) la reinicia y carga datos, útil para cachear o trabajar offline." },
-    { q:"¿Qué control muestra una lista repetida de registros con plantilla personalizable?", opts:["Label","Gallery","Button","Icon"], a:1, ex:"La Gallery repite una plantilla por cada fila de su propiedad Items; se navega con ThisItem y es el bloque básico para listas y tarjetas." },
-    { q:"En Power Fx, ¿qué diferencia hay entre Set() y UpdateContext()?", opts:["Son idénticas","Set() crea una variable global a toda la app; UpdateContext() crea una variable de contexto local a una pantalla","UpdateContext() es global","Set() solo funciona en OnStart"], a:1, ex:"Variables globales (Set) viven en toda la app; las de contexto (UpdateContext) solo en su pantalla. Hay también colecciones para conjuntos de datos." },
-    { q:"El lenguaje de fórmulas de Power Apps (Power Fx) está inspirado principalmente en:", opts:["SQL","Las fórmulas de Excel","Python","JavaScript"], a:1, ex:"Power Fx es declarativo y funcional, con sintaxis y funciones muy parecidas a las de Excel (If, Filter, Sum, Text...), para que sea accesible a usuarios de negocio." },
-    { q:"¿Qué función usas para moverte de la pantalla de inicio a la de detalle?", opts:["GoTo()","Navigate(PantallaDetalle, ScreenTransition.Cover)","OpenScreen()","Redirect()"], a:1, ex:"Navigate(destino, transición, {contexto}) cambia de pantalla y puede pasar variables de contexto. Back() regresa a la anterior." },
-    { q:"En un formulario, ¿qué hace SubmitForm(Form1)?", opts:["Limpia el formulario","Valida y guarda los cambios del formulario en la fuente de datos","Solo cambia a modo edición","Elimina el registro"], a:1, ex:"SubmitForm envía los datos; EditForm/NewForm cambian el modo; ResetForm limpia. Los eventos OnSuccess/OnFailure manejan el resultado." },
-    { q:"Quieres que la app dispare un flujo de aprobación al guardar. ¿Con qué se integra?", opts:["Power BI","Power Automate","SharePoint Designer","Azure DevOps"], a:1, ex:"Power Automate ejecuta flujos (aprobaciones, notificaciones, integraciones). Se llama desde Power Apps con NombreFlujo.Run(parámetros)." },
-    { q:"¿Cuándo se ejecuta la propiedad OnStart de la app?", opts:["Cada vez que se abre cualquier pantalla","Una vez, al iniciar la app (buena para cargar datos y variables globales)","Al cerrar la app","Nunca, está obsoleta"], a:1, ex:"OnStart corre al arrancar; OnVisible corre cada vez que se muestra una pantalla. Evita lógica pesada en OnStart para no retrasar el arranque." },
-    { q:"¿Qué es Dataverse en el contexto de Power Apps?", opts:["Un lenguaje de programación","Una base de datos en la nube segura y estructurada (tablas, relaciones, reglas) para las apps de Power Platform","Un editor de temas","Un conector a Twitter"], a:1, ex:"Dataverse almacena y gestiona datos de negocio con seguridad por roles, lógica de negocio y tipos de columna ricos; es el back-end nativo de las apps model-driven." },
+const DEMO_BANK = {
+  es: { topics: [
+    { id: "sql", name: "SQL", color: "#4bc0d9", qs: [
+      { q: "¿Diferencia entre INNER JOIN y LEFT JOIN?", opts: ["INNER trae solo coincidencias; LEFT trae todas las filas de la izquierda y NULL donde no hay match", "Son iguales", "LEFT solo funciona con índices", "INNER conserva filas sin match"], a: 0, ex: "LEFT JOIN preserva la tabla izquierda completa; útil para ver qué registros no tienen correspondencia. En entrevista, menciona un caso: clientes sin pedidos." },
+      { q: "¿WHERE vs HAVING?", opts: ["WHERE filtra filas antes de agrupar; HAVING filtra grupos después de GROUP BY", "HAVING es más rápido", "WHERE no permite AND", "Son intercambiables"], a: 0, ex: "HAVING opera sobre agregados (COUNT, SUM). Ejemplo: HAVING COUNT(*) > 5." },
+      { q: "¿Qué hace GROUP BY?", opts: ["Agrupa filas con el mismo valor para aplicar agregados por grupo", "Ordena el resultado", "Elimina duplicados de una columna", "Une dos tablas"], a: 0, ex: "Cada grupo produce una fila; las columnas del SELECT deben estar agregadas o en el GROUP BY." },
+    ]},
+    { id: "python", name: "Python", color: "#4bc0d9", qs: [
+      { q: "¿Lista vs tupla?", opts: ["La lista es mutable; la tupla es inmutable", "La tupla es más lenta siempre", "La lista no admite duplicados", "No hay diferencia"], a: 0, ex: "Usa tupla para datos fijos (coordenadas, registros) y como clave de diccionario." },
+      { q: "¿Qué hace dict.get('k', 0)?", opts: ["Devuelve el valor de 'k' o 0 si no existe, sin lanzar KeyError", "Borra la clave 'k'", "Siempre devuelve 0", "Lanza KeyError"], a: 0, ex: "Evita try/except para accesos con valor por defecto." },
+      { q: "¿Qué imprime [x*x for x in range(4)]?", opts: ["[0, 1, 4, 9]", "[1, 4, 9, 16]", "[0, 1, 2, 3]", "range(4)"], a: 0, ex: "List comprehension: eleva al cuadrado 0..3." },
+      { q: "¿Para qué sirve pandas?", opts: ["Manipular datos tabulares (DataFrame): filtrar, agrupar, unir, resumir", "Graficar mapas", "Servir páginas web", "Entrenar redes neuronales"], a: 0, ex: "df.groupby(...).agg(...) es el equivalente a GROUP BY de SQL." },
+    ]},
+    { id: "datos", name: "Análisis de datos", color: "#3fb27f", qs: [
+      { q: "¿Qué caracteriza a un buen KPI?", opts: ["Es medible, accionable y está alineado a un objetivo", "Tiene muchos decimales", "Cambia de definición seguido", "Solo lo entiende el analista"], a: 0, ex: "Si nadie puede influir en el número o nadie lo revisa, sobra." },
+      { q: "'Dos variables suben juntas, luego una causa la otra.' ¿Qué falla?", opts: ["Confunde correlación con causalidad; puede haber un tercer factor o azar", "Nada", "Faltan colores", "El tamaño de muestra no importa"], a: 0, ex: "Antes de afirmar causa: controla variables, revisa el mecanismo, compara con un grupo de control." },
+      { q: "Antes de analizar datos nuevos, ¿qué haces primero?", opts: ["Explorar y limpiar: nulos, duplicados, tipos, rangos imposibles, atípicos", "Sacar conclusiones", "Hacer el reporte final", "Borrar filas con cualquier nulo sin mirar"], a: 0, ex: "Documentar qué se limpió y por qué da credibilidad al resultado." },
+    ]},
   ]},
+  en: { topics: [
+    { id: "sql", name: "SQL", color: "#4bc0d9", qs: [
+      { q: "INNER JOIN vs LEFT JOIN?", opts: ["INNER returns only matches; LEFT returns all left rows with NULLs where there is no match", "They are identical", "LEFT needs indexes", "INNER keeps unmatched rows"], a: 0, ex: "LEFT JOIN keeps the whole left table — handy to find rows with no match, e.g. customers with no orders." },
+      { q: "WHERE vs HAVING?", opts: ["WHERE filters rows before grouping; HAVING filters groups after GROUP BY", "HAVING is faster", "WHERE can't use AND", "Interchangeable"], a: 0, ex: "HAVING works on aggregates, e.g. HAVING COUNT(*) > 5." },
+      { q: "What does GROUP BY do?", opts: ["Groups rows sharing a value so aggregates are computed per group", "Sorts the result", "Removes duplicates from a column", "Joins two tables"], a: 0, ex: "Each group yields one row; SELECT columns must be aggregated or in the GROUP BY." },
+    ]},
+    { id: "python", name: "Python", color: "#4bc0d9", qs: [
+      { q: "List vs tuple?", opts: ["List is mutable; tuple is immutable", "Tuple is always slower", "List forbids duplicates", "No difference"], a: 0, ex: "Use a tuple for fixed data and as a dict key." },
+      { q: "What does dict.get('k', 0) do?", opts: ["Returns the value for 'k', or 0 if missing, without raising KeyError", "Deletes 'k'", "Always returns 0", "Raises KeyError"], a: 0, ex: "Avoids try/except for defaulted lookups." },
+      { q: "What does [x*x for x in range(4)] print?", opts: ["[0, 1, 4, 9]", "[1, 4, 9, 16]", "[0, 1, 2, 3]", "range(4)"], a: 0, ex: "List comprehension squaring 0..3." },
+      { q: "What is pandas for?", opts: ["Working with tabular data (DataFrame): filter, group, join, summarise", "Drawing maps", "Serving web pages", "Training neural nets"], a: 0, ex: "df.groupby(...).agg(...) is SQL's GROUP BY." },
+    ]},
+    { id: "data", name: "Data analysis", color: "#3fb27f", qs: [
+      { q: "What makes a good KPI?", opts: ["Measurable, actionable, aligned to a goal", "Many decimals", "Redefined often", "Only the analyst understands it"], a: 0, ex: "If no one can move the number or no one reviews it, drop it." },
+      { q: "'Two variables rise together, so one causes the other.' What's wrong?", opts: ["Confuses correlation with causation; a third factor or chance may explain it", "Nothing", "Needs more colours", "Sample size is irrelevant"], a: 0, ex: "Before claiming cause: control variables, check the mechanism, compare against a control group." },
+      { q: "Before analysing a new dataset, what comes first?", opts: ["Explore and clean: nulls, duplicates, types, impossible ranges, outliers", "Draw conclusions", "Build the final report", "Drop any row with a null unseen"], a: 0, ex: "Documenting what you cleaned and why gives the result credibility." },
+    ]},
+  ]},
+};
 
-  { id:"bi", name:"Power BI", color:"var(--t-bi)", qs:[
-    { q:"En un modelo estrella, ¿qué contiene la tabla de hechos (fact)?", opts:["Los atributos descriptivos como nombre de producto o ciudad","Las métricas numéricas y las claves foráneas a las dimensiones","Solo fechas","La configuración del reporte"], a:1, ex:"La fact guarda eventos medibles (ventas, toneladas, cantidad) y llaves; las dimensiones (Fecha, Producto, Planta) aportan el contexto para filtrar y agrupar." },
-    { q:"¿Cuándo se evalúa una measure de DAX frente a una columna calculada?", opts:["Ambas al cargar el modelo","La measure al vuelo según el contexto del visual; la columna calculada fila por fila al refrescar","La columna calculada al vuelo; la measure al cargar","Ninguna se recalcula nunca"], a:1, ex:"La columna calculada ocupa espacio y se materializa al refrescar. La measure no ocupa almacenamiento y responde al contexto de filtro de cada celda del visual." },
-    { q:"¿Para qué sirve CALCULATE en DAX?", opts:["Sumar dos columnas","Evaluar una expresión modificando el contexto de filtro","Crear una relación","Cambiar el idioma del reporte"], a:1, ex:"CALCULATE(expresión, filtros...) es la función central de DAX: aplica, quita o reemplaza filtros. Ej: CALCULATE([Ventas], Producto[Tipo]=\"Cemento\")." },
-    { q:"¿Qué hace SUMX(Ventas, Ventas[Cant] * Ventas[Precio])?", opts:["Suma la columna Cant","Itera fila por fila multiplicando Cant × Precio y suma los resultados","Cuenta las filas","Devuelve el promedio de Precio"], a:1, ex:"SUMX es un iterador: recorre la tabla, evalúa la expresión en cada fila (row context) y suma. Necesario cuando el cálculo depende de varias columnas por fila." },
-    { q:"En una relación uno-a-muchos entre Fecha (1) y Ventas (*), ¿en qué dirección fluye el filtro por defecto?", opts:["De Ventas hacia Fecha","De Fecha (uno) hacia Ventas (muchos)","En ambas direcciones siempre","No hay filtrado"], a:1, ex:"El filtro cruzado predeterminado va del lado 'uno' al lado 'muchos'. Filtrar por un mes en la dimensión Fecha reduce las filas visibles de Ventas." },
-    { q:"¿Qué función DAX trae un valor de la tabla del lado 'uno' hacia una columna de la tabla del lado 'muchos'?", opts:["LOOKUPVALUE únicamente","RELATED","MERGE","JOIN"], a:1, ex:"RELATED sigue una relación existente desde el lado 'muchos' para traer una columna de la dimensión. En sentido inverso se usa RELATEDTABLE." },
-    { q:"Necesitas dividir 'Nombre completo' en nombre y apellido de forma repetible al refrescar. ¿Dónde lo haces?", opts:["En DAX con una measure","En Power Query, antes de cargar al modelo","En el visual, con formato condicional","No se puede"], a:1, ex:"Regla práctica: transforma la forma de los datos en Power Query (columnas, tipos, limpieza) y reserva DAX para cálculos analíticos sobre el modelo ya limpio." },
-    { q:"¿Diferencia entre modo Import y DirectQuery?", opts:["Import copia los datos a un modelo en memoria comprimido; DirectQuery consulta la fuente en tiempo real sin almacenarlos","Son lo mismo con distinto nombre","DirectQuery es más rápido siempre","Import no permite refrescar"], a:0, ex:"Import es más rápido y con todo DAX disponible, pero con datos a fecha del último refresh. DirectQuery da datos frescos y maneja volúmenes enormes, a costa de rendimiento y algunas limitaciones." },
-    { q:"¿Qué es el 'row context' en DAX?", opts:["El filtro que aplica un slicer","La noción de 'la fila actual' cuando se itera una tabla (columnas calculadas, funciones X)","El tema de color del reporte","Una relación bidireccional"], a:1, ex:"Row context = fila actual; filter context = conjunto de filtros activos. CALCULATE puede convertir row context en filter context (context transition)." },
-    { q:"Un slicer y un filtro de panel, ¿en qué se diferencian sobre todo?", opts:["El slicer es un objeto visual en el lienzo que el usuario final manipula; el filtro de panel vive en el panel Filtros","El filtro de panel es más rápido","El slicer no afecta a los datos","Son incompatibles"], a:0, ex:"Ambos filtran, pero el slicer es parte del reporte y visible/interactivo para quien lo consume; los filtros de panel los configura el autor." },
-    { q:"¿Qué visual es el más adecuado para mostrar la evolución de un KPI mes a mes?", opts:["Gráfico de pastel","Gráfico de líneas","Tarjeta (card)","Mapa"], a:1, ex:"Las líneas comunican tendencia en el tiempo. El pastel sirve (con pocas categorías) para parte-de-un-todo, no para series temporales." },
-    { q:"Tienes que analizar ventas por 'fecha de pedido' y por 'fecha de envío' usando una sola tabla Fecha. ¿Cómo?", opts:["Duplicar la tabla Fecha","Crear dos relaciones a Fecha (una activa, una inactiva) y activar la inactiva con USERELATIONSHIP dentro de CALCULATE","No es posible con una sola tabla","Usar RELATED dos veces"], a:1, ex:"Es una 'role-playing dimension'. Solo una relación puede estar activa; USERELATIONSHIP(Ventas[FechaEnvio], Fecha[Fecha]) activa la otra para un cálculo puntual." },
-  ]},
+/* ============================================================
+   BANKS
+   ============================================================ */
+function loadBanksStore() {
+  try {
+    const p = JSON.parse(localStorage.getItem("sprint-banks") || "");
+    if (p && Array.isArray(p.banks)) return { activeId: p.activeId || null, banks: p.banks };
+  } catch (e) {}
+  return { activeId: null, banks: [] };
+}
+function saveBanksStore(s) { try { localStorage.setItem("sprint-banks", JSON.stringify(s)); } catch (e) {} }
+function banksList() { return loadBanksStore().banks; }
+function activeBank() { const s = loadBanksStore(); return s.banks.find((b) => b.id === s.activeId) || null; }
 
-  { id:"copilot", name:"Copilot Studio", color:"var(--t-copilot)", qs:[
-    { q:"¿Qué es Copilot Studio?", opts:["Un IDE para C#","Una herramienta low-code de Power Platform para crear agentes/copilots conversacionales personalizados","Un modelo de lenguaje propio de tu empresa","Un cliente de correo"], a:1, ex:"Copilot Studio (antes Power Virtual Agents) permite construir, probar y publicar copilots con lógica de conversación, conexión a datos y acciones, sin escribir código." },
-    { q:"En Copilot Studio, ¿qué es un 'topic'?", opts:["Un color del tema visual","Una unidad de conversación con frases desencadenantes (trigger phrases) y un flujo de nodos que responde a una intención","Un permiso de usuario","Una tabla de Dataverse"], a:1, ex:"Cada topic maneja una intención (p. ej. 'consultar estatus de pedido'): se activa por trigger phrases y ejecuta preguntas, condiciones y respuestas." },
-    { q:"¿Qué permiten las 'actions' (o plugins) en un copilot?", opts:["Cambiar el idioma","Ejecutar operaciones externas: llamar un flujo de Power Automate, una API o un conector para traer o enviar datos","Editar el código fuente del modelo","Nada, son decorativas"], a:1, ex:"Las actions conectan la conversación con sistemas reales: crear un ticket, consultar inventario, etc. Suelen apoyarse en Power Automate o conectores." },
-    { q:"¿Qué es el 'grounding' o fuentes de conocimiento de un copilot?", opts:["El hosting del bot","Documentos y orígenes (SharePoint, sitios web públicos, Dataverse, archivos) que el copilot usa para generar respuestas basadas en tu información","Las pruebas unitarias","El registro de errores"], a:1, ex:"Grounding conecta el modelo generativo a tu contenido para que responda con datos de la organización en lugar de solo conocimiento general, reduciendo alucinaciones." },
-    { q:"¿Para qué sirven las 'trigger phrases' de un topic?", opts:["Para dar formato al texto","Son ejemplos de cómo el usuario podría expresar la intención; el modelo las usa para decidir qué topic activar","Para traducir el bot","Para limitar el número de usuarios"], a:1, ex:"No hace falta listar todas las variantes: el motor de comprensión del lenguaje generaliza a partir de unos cuantos ejemplos representativos." },
-    { q:"'Generative answers' en Copilot Studio se refiere a:", opts:["Respuestas escritas manualmente nodo por nodo","Respuestas que el copilot genera al vuelo a partir de las fuentes de conocimiento cuando ningún topic autorizado coincide","Un plan de pago","Un tipo de gráfico"], a:1, ex:"Combina topics autorizados (control fino) con respuestas generativas sobre tu contenido (cobertura amplia) para preguntas no previstas." },
-    { q:"¿A qué familia de productos pertenece Copilot Studio?", opts:["Microsoft 365 Office","Power Platform (junto a Power Apps, Power Automate, Power BI, Power Pages)","Azure DevOps","Dynamics GP"], a:1, ex:"Comparte conectores, Dataverse y modelo de gobierno con el resto de Power Platform, lo que facilita integrarlo con apps y flujos existentes." },
-    { q:"Diferencia entre Microsoft Copilot (en M365) y un copilot hecho en Copilot Studio:", opts:["Son el mismo producto","Microsoft Copilot es el asistente listo que ya viene integrado en Word/Excel/Teams; en Copilot Studio construyes asistentes a medida para escenarios específicos","Copilot Studio solo sirve para imágenes","M365 Copilot no usa IA"], a:1, ex:"Uno es un producto terminado y transversal; el otro es la plataforma para crear (o extender) copilots propios adaptados a un proceso de negocio." },
-    { q:"Al escribir instrucciones (prompt) para un copilot, ¿qué práctica ayuda más?", opts:["Ser lo más breve y ambiguo posible","Dar contexto, rol, formato de salida esperado y ejemplos concretos","Usar solo mayúsculas","Evitar dar ejemplos"], a:1, ex:"Un buen prompt especifica quién es el asistente, qué debe hacer, con qué datos y cómo entregar la respuesta. Los ejemplos reducen la variabilidad." },
-    { q:"¿Por dónde se puede publicar un copilot creado en Copilot Studio?", opts:["Solo por correo","En canales como Microsoft Teams, un sitio web, apps móviles o de escritorio","Únicamente dentro de Power BI","No se puede publicar, solo probar"], a:1, ex:"Tras probarlo, se publica a uno o varios canales; Teams y web (widget de chat) son los más comunes en entornos corporativos." },
-    { q:"Sobre privacidad: cuando usas Copilot con datos de tu organización...", opts:["Tus datos entrenan el modelo base de OpenAI","Los datos permanecen dentro del límite de cumplimiento del tenant y no se usan para entrenar los modelos de base","Se publican en internet","Se borran al cerrar sesión"], a:1, ex:"Microsoft indica que los prompts, respuestas y datos accedidos vía Graph no se usan para entrenar los foundation models y respetan permisos y residencia de datos." },
-    { q:"Copilot dentro de Excel puede ayudarte a:", opts:["Solo cambiar colores","Sugerir fórmulas, generar tablas y gráficos, y explicar o resumir datos en lenguaje natural","Instalar complementos","Enviar correos"], a:1, ex:"Interpreta una petición en lenguaje natural sobre un rango o tabla y propone fórmulas, análisis, formato condicional o visualizaciones." },
-  ]},
+function _hash(str) { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0; return Math.abs(h).toString(36).slice(0, 6).padStart(6, "0"); }
 
-  { id:"python", name:"Python", color:"var(--t-python)", qs:[
-    { q:"¿Diferencia fundamental entre una lista y una tupla?", opts:["La lista guarda números y la tupla texto","La lista es mutable (se puede modificar); la tupla es inmutable","La tupla puede tener más elementos","No hay diferencia"], a:1, ex:"list = [1,2,3] permite append/reasignar elementos; tuple = (1,2,3) no. Las tuplas sirven como claves de diccionario o para datos que no deben cambiar." },
-    { q:"¿Qué imprime este código?", code:"d = {\"a\": 1}\nprint(d.get(\"b\", 0))", opts:["KeyError","None","0","b"], a:2, ex:"dict.get(clave, valor_por_defecto) devuelve el valor por defecto si la clave no existe, en lugar de lanzar KeyError como haría d[\"b\"]." },
-    { q:"¿Qué produce?", code:"print([x*x for x in range(4)])", opts:["[1, 4, 9, 16]","[0, 1, 4, 9]","[0, 1, 2, 3]","[1, 2, 3, 4]"], a:1, ex:"range(4) genera 0,1,2,3. La list comprehension eleva cada uno al cuadrado: 0, 1, 4, 9." },
-    { q:"Con s = \"analitica\", ¿qué devuelve s[1:4]?", code:"s = \"analitica\"\nprint(s[1:4])", opts:["\"anal\"","\"nal\"","\"nali\"","\"ana\""], a:1, ex:"El slice [1:4] toma desde el índice 1 hasta el 3 (el 4 no se incluye): caracteres 'n','a','l'." },
-    { q:"¿Diferencia entre == e is en Python?", opts:["Son idénticos","== compara si los valores son iguales; is compara si son el mismo objeto en memoria","is compara valores","== compara tipos"], a:1, ex:"Usa == para comparar contenido. is solo para identidad, típicamente 'x is None'. Dos listas con el mismo contenido son == pero no is." },
-    { q:"¿Qué imprime?", code:"nombre = \"Ana\"\nedad = 25\nprint(f\"{nombre} tiene {edad} anios\")", opts:["{nombre} tiene {edad} anios","Ana tiene 25 anios","Error de sintaxis","Ana tiene edad anios"], a:1, ex:"Un f-string (prefijo f) interpola expresiones entre llaves con el valor de las variables en el momento de ejecutarse." },
-    { q:"En pandas, pd.read_csv(\"datos.csv\") devuelve:", opts:["Una lista de strings","Un DataFrame (tabla con filas y columnas etiquetadas)","Un diccionario","Un número"], a:1, ex:"El DataFrame es la estructura central de pandas. df.head() muestra las primeras filas y df.info() los tipos y nulos por columna." },
-    { q:"¿Qué imprime?", code:"total = 0\nfor i in range(1, 4):\n    total += i\nprint(total)", opts:["3","6","10","4"], a:1, ex:"range(1,4) recorre 1, 2, 3. La suma acumulada es 1+2+3 = 6." },
-    { q:"¿Qué pasa si intentas s = \"hola\"; s[0] = \"H\"?", opts:["s se vuelve \"Hola\"","Lanza TypeError: los strings son inmutables","Devuelve None","Se ignora silenciosamente"], a:1, ex:"No se puede modificar un carácter in situ. Hay que crear un nuevo string: s = \"H\" + s[1:] o s.replace(...)." },
-    { q:"¿Para qué sirve un bloque try / except?", opts:["Para acelerar el código","Para capturar y manejar errores en tiempo de ejecución sin que el programa se detenga","Para declarar variables","Para importar módulos"], a:1, ex:"El código de try se ejecuta; si lanza una excepción del tipo indicado en except, se maneja ahí. finally corre siempre (limpieza)." },
-    { q:"¿Qué imprime?", code:"print([1, 2, 3, 4][::-1])", opts:["[1, 2, 3, 4]","[4, 3, 2, 1]","[4, 1]","Error"], a:1, ex:"El slice [::-1] recorre la secuencia con paso -1, devolviendo una copia invertida." },
-    { q:"¿Qué devuelve len({\"a\": 1, \"b\": 2, \"c\": 3})?", opts:["6","3","1","Error"], a:1, ex:"len() sobre un diccionario devuelve el número de pares clave-valor, en este caso 3." },
-  ]},
-
-  { id:"sql", name:"SQL", color:"var(--t-sql)", qs:[
-    { q:"¿Diferencia entre INNER JOIN y LEFT JOIN?", opts:["INNER JOIN es más rápido siempre","INNER JOIN devuelve solo filas con coincidencia en ambas tablas; LEFT JOIN devuelve todas las de la izquierda y NULL donde no hay coincidencia","LEFT JOIN elimina duplicados","Son sinónimos"], a:1, ex:"Si necesitas conservar clientes sin pedidos (y ver NULL en las columnas de pedidos), usas LEFT JOIN; si solo quieres clientes con pedidos, INNER JOIN." },
-    { q:"¿Cuál es la diferencia entre WHERE y HAVING?", opts:["No hay diferencia","WHERE filtra filas antes de agrupar; HAVING filtra grupos después de GROUP BY (puede usar agregados)","HAVING va antes que WHERE","WHERE solo funciona con números"], a:1, ex:"WHERE cantidad > 0 filtra registros individuales; HAVING SUM(cantidad) > 100 filtra grupos ya agregados. No puedes usar SUM() en WHERE." },
-    { q:"¿Qué hace esta consulta?", code:"SELECT planta, SUM(toneladas)\nFROM produccion\nGROUP BY planta;", opts:["Suma todas las toneladas en un solo número","Devuelve el total de toneladas por cada planta","Cuenta las plantas","Ordena por toneladas"], a:1, ex:"GROUP BY colapsa las filas de cada planta en una y el agregado SUM se calcula por grupo. Cada columna del SELECT no agregada debe estar en el GROUP BY." },
-    { q:"¿Diferencia entre COUNT(*) y COUNT(columna)?", opts:["Son iguales","COUNT(*) cuenta todas las filas; COUNT(columna) cuenta solo las filas donde esa columna NO es NULL","COUNT(columna) es más rápido","COUNT(*) ignora duplicados"], a:1, ex:"Por eso COUNT(*) y COUNT(email) pueden dar números distintos si hay emails nulos. COUNT(DISTINCT columna) cuenta valores únicos no nulos." },
-    { q:"¿Qué hace SELECT DISTINCT ciudad FROM clientes?", opts:["Ordena las ciudades","Devuelve la lista de ciudades sin repeticiones","Cuenta las ciudades","Borra ciudades duplicadas de la tabla"], a:1, ex:"DISTINCT elimina filas duplicadas del resultado (no modifica la tabla). Con varias columnas, considera única la combinación completa." },
-    { q:"Sin cláusula ASC/DESC, ORDER BY fecha ordena de forma:", opts:["Descendente (más reciente primero)","Ascendente (más antiguo primero)","Aleatoria","No ordena"], a:1, ex:"ASC es el valor por defecto. Para lo más reciente primero hay que escribir ORDER BY fecha DESC explícitamente." },
-    { q:"¿Qué devuelve?", code:"SELECT nombre FROM productos\nWHERE id IN (SELECT producto_id FROM ventas);", opts:["Todos los productos","Solo los productos que aparecen al menos una vez en la tabla ventas","Los productos sin ventas","Un error"], a:1, ex:"La subconsulta produce la lista de IDs vendidos; IN filtra los productos cuyo id está en esa lista. Es una forma de 'productos con ventas'." },
-    { q:"En SELECT c.nombre FROM clientes AS c, ¿qué es 'c'?", opts:["Una función","Un alias de tabla para escribir referencias más cortas","Una columna","Un comentario"], a:1, ex:"Los alias (con o sin AS) acortan nombres de tablas y columnas, y son necesarios cuando una consulta une la misma tabla consigo misma (self-join)." },
-    { q:"¿Cómo se filtran las filas cuyo campo 'telefono' no tiene valor?", opts:["WHERE telefono = NULL","WHERE telefono IS NULL","WHERE telefono = ''","WHERE telefono != 0"], a:1, ex:"NULL no es un valor comparable con =. Hay que usar IS NULL / IS NOT NULL. 'telefono = NULL' nunca es verdadero." },
-    { q:"¿Qué hace ROW_NUMBER() OVER (PARTITION BY planta ORDER BY toneladas DESC)?", opts:["Suma toneladas por planta","Asigna 1, 2, 3... a las filas dentro de cada planta, ordenadas por toneladas de mayor a menor","Cuenta las plantas","Borra duplicados"], a:1, ex:"Las funciones de ventana calculan sobre un conjunto de filas relacionadas sin colapsarlas. Sirve para 'top N por grupo', rankings y comparaciones fila a fila." },
-    { q:"¿Diferencia entre UNION y UNION ALL?", opts:["UNION ALL ordena el resultado","UNION elimina filas duplicadas del resultado combinado; UNION ALL las conserva todas (y es más rápido)","UNION suma columnas","Son iguales"], a:1, ex:"Si sabes que no hay duplicados o los quieres conservar, UNION ALL evita el costo de la deduplicación." },
-    { q:"¿Cuál es el orden lógico real de ejecución de una consulta?", opts:["SELECT → FROM → WHERE → GROUP BY → ORDER BY","FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY","WHERE → FROM → SELECT → GROUP BY","ORDER BY → SELECT → FROM → WHERE"], a:1, ex:"Por eso un alias definido en SELECT no se puede usar en WHERE (aún no existe), pero sí en ORDER BY, que se evalúa al final." },
-  ]},
-
-  { id:"js", name:"JavaScript", color:"var(--t-js)", qs:[
-    { q:"¿Diferencia entre let, const y var?", opts:["Son intercambiables","let y const tienen alcance de bloque; var tiene alcance de función. const además no permite reasignar la variable","const no existe","var es de bloque"], a:1, ex:"En código moderno se usa const por defecto y let cuando hay que reasignar; var se evita por su hoisting y alcance de función confusos." },
-    { q:"¿Qué evalúa como true?", code:"console.log(0 == \"0\", 0 === \"0\");", opts:["true true","false false","true false","false true"], a:2, ex:"== convierte tipos antes de comparar (0 y \"0\" se igualan → true). === compara valor y tipo sin convertir (number vs string → false)." },
-    { q:"¿Qué devuelve [1, 2, 3].map(x => x * 2)?", opts:["6","[1, 2, 3]","[2, 4, 6]","undefined"], a:2, ex:"map crea un arreglo nuevo aplicando la función a cada elemento, sin modificar el original. Su longitud es siempre igual a la del original." },
-    { q:"¿Qué hace Array.prototype.filter?", opts:["Ordena el arreglo","Devuelve un nuevo arreglo con solo los elementos para los que la función devuelve un valor truthy","Suma los elementos","Elimina el primer elemento"], a:1, ex:"[1,2,3,4].filter(n => n % 2 === 0) → [2, 4]. No muta el arreglo original; puede devolver menos elementos (o ninguno)." },
-    { q:"¿Qué imprime?", code:"const r = [1, 2, 3, 4].reduce((acc, n) => acc + n, 0);\nconsole.log(r);", opts:["10","[1,2,3,4]","0","24"], a:0, ex:"reduce acumula un valor recorriendo el arreglo. Empezando en 0: 0+1+2+3+4 = 10. El segundo argumento es el valor inicial del acumulador." },
-    { q:"¿Qué devuelve typeof null?", opts:["\"null\"","\"object\"","\"undefined\"","\"boolean\""], a:1, ex:"Es un bug histórico de JavaScript que se mantiene por compatibilidad. Para detectar null se compara directamente: valor === null." },
-    { q:"Una función async, ¿qué devuelve siempre?", opts:["El valor tal cual","Una Promesa (Promise) que se resuelve con el valor retornado","undefined","Un callback"], a:1, ex:"Por eso se consume con await o .then(). await pausa dentro de la función async hasta que la promesa se resuelve o rechaza." },
-    { q:"¿Es válido este código?", code:"const arr = [1, 2];\narr.push(3);\nconsole.log(arr);", opts:["No, const impide modificar el arreglo → error","Sí, imprime [1, 2, 3]: const impide reasignar la variable, no mutar el contenido","Imprime [1, 2]","Imprime 3"], a:1, ex:"const congela el enlace variable→valor, no el objeto. Puedes mutar el arreglo (push, pop), pero no hacer arr = otroArreglo." },
-    { q:"¿Qué produce la desestructuración const { a, b } = { a: 1, b: 2, c: 3 }?", opts:["a y b quedan undefined","a = 1 y b = 2; c se descarta","Un error","a = {a:1}"], a:1, ex:"La desestructuración extrae propiedades por nombre a variables. Con arreglos es por posición: const [x, y] = [10, 20]." },
-    { q:"¿Qué imprime?", code:"const nombre = \"BI\";\nconsole.log(`Rol: ${nombre.toLowerCase()}`);", opts:["Rol: ${nombre}","Rol: bi","Rol: BI","Error"], a:1, ex:"Los template literals (comillas invertidas) interpolan expresiones dentro de ${ }, y aquí se evalúa el método antes de insertar el resultado." },
-    { q:"map, filter y forEach recorren un arreglo. ¿Cuál NO devuelve un valor útil?", opts:["map","filter","forEach","Todos devuelven un arreglo"], a:2, ex:"forEach devuelve undefined; se usa solo por su efecto secundario (imprimir, acumular fuera). Para transformar y encadenar se usan map/filter." },
-    { q:"¿Qué diferencia hay entre null y undefined?", opts:["Son idénticos","undefined: la variable existe pero no se le asignó valor. null: asignación explícita de 'sin valor'","null causa error al usarse","undefined solo aparece en funciones"], a:1, ex:"undefined suele venir del motor (variable sin inicializar, propiedad inexistente); null lo pone el programador para indicar ausencia intencional." },
-  ]},
-
-  { id:"cemex", name:"CEMEX y entrevista", color:"var(--t-cemex)", qs:[
-    { q:"¿Cuál es el negocio principal de CEMEX?", opts:["Software empresarial","Materiales para la construcción: cemento, concreto premezclado y agregados","Logística de paquetería","Energía eléctrica"], a:1, ex:"CEMEX es una de las mayores empresas globales de materiales de construcción, con origen en Monterrey, México. Conocer su cadena de valor ayuda a conectar tu rol de datos con la operación." },
-    { q:"En la cadena de producción del cemento, ¿qué orden es correcto?", opts:["Concreto → clinker → cantera → cemento","Cantera (extracción) → horno/clinker → molienda a cemento → concreto premezclado","Cemento → cantera → concreto","Clinker → cantera → concreto → cemento"], a:1, ex:"Se extrae piedra caliza, se cuece para formar clinker, se muele con aditivos para obtener cemento y se combina con agua y agregados para el concreto. Los KPIs de operación viven en cada etapa." },
-    { q:"¿Qué caracteriza a un buen KPI para la operación?", opts:["Que sea difícil de calcular","Que sea medible, accionable y esté alineado a un objetivo del negocio","Que use muchos colores en el dashboard","Que cambie de definición cada mes"], a:1, ex:"Un KPI útil responde '¿esto nos acerca al objetivo?' y alguien puede actuar sobre él. Si nadie puede influir en el número o nadie lo revisa, sobra." },
-    { q:"El método STAR para responder preguntas de comportamiento significa:", opts:["Situación, Tarea, Acción, Resultado","Start, Talk, Ask, Repeat","Sistema, Tiempo, Análisis, Reporte","Situación, Táctica, Alcance, Recomendación"], a:0, ex:"Describe brevemente el contexto (S), tu responsabilidad (T), lo que hiciste tú concretamente (A) y el resultado con datos + qué aprendiste (R)." },
-    { q:"Te preguntan por un error que cometiste. ¿Mejor enfoque?", opts:["Decir que nunca cometes errores","Contar uno real, asumir tu parte, explicar cómo lo corregiste y qué cambiaste para que no se repita","Culpar a un compañero","Elegir un error tan pequeño que no cuente"], a:1, ex:"Buscan honestidad y capacidad de aprendizaje, no perfección. El cierre (qué mejoraste) es la parte más importante de la respuesta." },
-    { q:"Al diseñar un dashboard para la operación, ¿qué va primero?", opts:["Las tablas de detalle con todos los registros","El resumen y el estado general (KPIs, semáforos) antes que el detalle","Los filtros avanzados","El logo lo más grande posible"], a:1, ex:"Quien consume el tablero necesita ver de un vistazo qué requiere atención; el detalle se explora después. Codifica el estado con forma y color, no solo con números." },
-    { q:"¿Qué es CEMEX Go?", opts:["Un programa de becas","La plataforma digital para que los clientes hagan pedidos, den seguimiento a entregas y consulten facturas en línea","Un tipo de cemento","Una app de recursos humanos"], a:1, ex:"Es un ejemplo del enfoque de digitalización de CEMEX. Mencionar que conoces sus iniciativas digitales muestra interés genuino en la empresa." },
-    { q:"'La planta con más paros también tuvo más lluvia ese mes, por lo tanto la lluvia causa los paros.' ¿Qué falla?", opts:["Nada, es correcto","Confunde correlación con causalidad: dos variables se mueven juntas pero puede haber un tercer factor o azar","Faltan más colores","El tamaño de muestra es irrelevante"], a:1, ex:"Correlación ≠ causalidad. Antes de afirmar causa hay que controlar otras variables, revisar el mecanismo y, si se puede, comparar con un grupo de control." },
-    { q:"Antes de analizar un conjunto de datos nuevo, ¿qué haces primero?", opts:["Sacar conclusiones de inmediato","Explorar y limpiar: revisar nulos, duplicados, tipos de dato, rangos imposibles y valores atípicos","Crear el reporte final","Borrar las filas con cualquier valor faltante sin revisarlas"], a:1, ex:"El análisis solo es tan bueno como los datos que lo alimentan. Documentar qué se limpió y por qué también da credibilidad al resultado." },
-    { q:"Te preguntan cómo compaginarías la práctica con exámenes y clases. Mejor respuesta:", opts:["Prometer que la escuela nunca interferirá","Explicar cómo planificas, priorizas y comunicas con anticipación los periodos de carga para reorganizar entregas","Decir que dejarías la escuela en segundo plano","Evadir la pregunta"], a:1, ex:"Muestran flexibilidad de horario; quieren ver que eres organizado y que avisas a tiempo, no que sacrificas una cosa por la otra." },
-    { q:"'¿Por qué quieres esta práctica en CEMEX?' Enfoque más sólido:", opts:["Porque necesito el apoyo económico","Conectar tus habilidades (Power BI, SQL, Python) con lo que hace el área, y qué quieres aprender y aportar en esos 6 meses","Porque cualquier práctica me sirve","Porque queda cerca de mi casa"], a:1, ex:"Combina motivación concreta (aprender de la operación, aplicar datos a un negocio industrial real) con lo que tú aportas. Evita razones puramente personales." },
-    { q:"En una entrevista técnica no sabes la respuesta exacta. ¿Qué conviene hacer?", opts:["Inventar una respuesta con seguridad","Decir lo que sí sabes del tema, razonar en voz alta y explicar cómo lo averiguarías","Quedarte callado","Cambiar de tema"], a:1, ex:"Evalúan tu forma de pensar, no solo el dato memorizado. Reconocer el límite y mostrar método de resolución deja mejor impresión que fingir." },
-  ]},
-
-  { id:"proyectos", name:"Tus proyectos", color:"var(--t-proyectos)", qs:[
-    { q:"¿Qué es Project ATLAS (atlas-prototipo-web / atlas-portal-colaborador)?", opts:["Un videojuego de disparos","Un Portal del Colaborador gamificado: autoservicio de RH presentado como una oficina 2D jugable, hecho en Unity (WebGL)","Un ERP de contabilidad","Una tienda en línea"], a:1, ex:"Proyecto con socio formador real (PeopleTech / Eslabón Systems, Módulo Kiosco) en el Tec de Monterrey, equipo Top-Down Studios. En la entrevista: di tu rol concreto y una decisión técnica que tomaste tú." },
-    { q:"El prototipo web de ATLAS es un solo HTML autocontenido. ¿Cómo maneja los datos de sus estaciones?", opts:["Con una base de datos MySQL real","Con un fetch simulado (imitando una API real) y tablas de datos simuladas: Usuarios, Solicitudes, Nómina, Documentos, Tareas","No maneja datos","Los pide por correo"], a:1, ex:"Aunque sea prototipo, modelaste los datos y el flujo cliente-servidor. Eso es lo que puedes contar cuando pregunten por diseño o análisis de datos." },
-    { q:"En pakupaku, ¿cómo está separada la aplicación?", opts:["Todo en un solo script","Backend en FastAPI (auth con JWT, perfiles, recetas, logs, medidas, búsqueda USDA) + frontend React/Capacitor para iOS y Android","Solo frontend en React","Backend en PHP + frontend en jQuery"], a:1, ex:"Buen ejemplo de APIs REST y separación de responsabilidades. Ten claros los grupos de rutas: /auth, /users, /foods, /logs, /recipes, /measurements. Usa SQLAlchemy async + Pydantic." },
-    { q:"¿Con qué API externa se integra pakupaku para buscar alimentos y sus nutrientes?", opts:["Google Maps","USDA FoodData Central","OpenAI","La API de Twitter"], a:1, ex:"Consumir una API pública, parsear su respuesta y extraer solo los nutrientes que necesitas (usda.py) es una historia sólida de 'trabajé con datos de terceros'." },
-    { q:"pakupaku incluye un 'safe mode'. ¿Qué hace?", opts:["Cifra la base de datos","Oculta los números de calorías y usa un onboarding inclusivo (estimaciones con soporte para HRT y condiciones metabólicas)","Desactiva el internet","Bloquea la app con contraseña"], a:1, ex:"Muestra que piensas en el usuario y en casos límite, no solo en el código. Sirve como ejemplo de 'requisito no obvio que identifiqué'." },
-    { q:"boxbuddy es un tracker de inventario para pequeños negocios. ¿Qué funciones tiene?", opts:["Solo una lista de texto","Generación y escaneo de códigos de barras/QR, control de costo/precio/margen y alertas de stock bajo","Un chat en vivo","Edición de video"], a:1, ex:"Conéctalo con la vacante: son indicadores de operación (margen, rotación, quiebres de stock) — justo 'creación de indicadores y estrategias para la operación'." },
-    { q:"¿Qué stack usa boxbuddy y cómo aísla los datos de cada cuenta?", opts:["WordPress; todos ven todo","Next.js + TypeScript + Supabase (Auth y Postgres) en Vercel; cada cuenta ve solo su inventario y el acceso a datos pasa por las API routes con la service-role key","Un Excel compartido por correo","Django sin autenticación"], a:1, ex:"Puedes explicar la diferencia entre la anon key (segura en el navegador, solo para auth) y la service-role key (solo servidor). Eso demuestra criterio de seguridad." },
-    { q:"¿Qué es MaxBot?", opts:["Un bot de trading","Un chatbot tipo CV interactivo, con un modelo basado en intents, hecho en Python + Streamlit","Un bot de Discord para música","Un asistente de voz para el coche"], a:1, ex:"Proyecto chico pero con iniciativa: otra forma de presentar tu currículum. Menciónalo si preguntan por proyectos personales o por NLP básico (intents)." },
-    { q:"kechappu (y su variante pawmodoro), ¿qué es y con qué está hecho?", opts:["Un temporizador Pomodoro kawaii para macOS hecho con Electron (JS/CSS): panel de tareas, subtareas, estimaciones, tiempo registrado y dark mode persistente","Un juego de plataformas en Unity","Una extensión de Chrome","Un script de terminal"], a:0, ex:"Sirve para mostrar que llevas un proyecto hasta empaquetarlo (electron-packager genera el .app). pawmodoro añade 'salas compartidas' con Supabase." },
-    { q:"En 'Who's That Pokémon?', ¿qué herramientas de Python usaste?", opts:["TensorFlow y CUDA","Streamlit para la interfaz, CSV para los datos de los Pokémon y PIL para procesar las imágenes","Django y PostgreSQL","Solo la librería estándar"], a:1, ex:"Buen primer ejemplo para hablar de leer/estructurar datos desde CSV y manipular imágenes con PIL. (La v1 usaba Tkinter; la v2 migró a Streamlit.)" },
-    { q:"next-stop (sistema de transporte público), ¿cómo está organizado?", opts:["Todo en un archivo","Frontend HTML/CSS/JS separado de un backend API en PHP, con configuración en config.php y pensado para pantallas móviles y de kiosco","Una hoja de cálculo","Un bot de Telegram"], a:1, ex:"Habla de arquitectura modular y de diseño para kiosco (pantalla grande, poco texto, alto contraste), que se conecta con el Módulo Kiosco de ATLAS." },
-    { q:"¿Qué es dynamic-cv y dónde está desplegado?", opts:["Un backend en Java","Un portafolio personal estático en Next.js/TypeScript, desplegado en Vercel y sin variables de entorno","Una base de datos","Un notebook de Jupyter"], a:1, ex:"Tenerlo ya en línea es un plus: puedes ofrecer el link en la entrevista como muestra de tu trabajo." },
-    { q:"El repo Skibidi-Toilet-Dating-Simulator es...", opts:["Un trabajo final de matemáticas","Tu entrada a la Brainrot Hackathon, hecha con Ren'Py (motor de novelas visuales)","Un cliente de correo","Un compilador"], a:1, ex:"Menciónalo si preguntan por hackathons o por trabajar bajo presión: entregar algo funcional y completo en pocas horas cuenta como logro." },
-    { q:"Te dicen 'háblame de un proyecto tuyo'. ¿Qué estructura conviene?", opts:["Listar todos tus repos de GitHub uno por uno","Qué problema resuelve → tu rol concreto → stack y por qué → un reto y cómo lo resolviste → resultado y aprendizaje","Solo decir el nombre y el lenguaje","Hablar únicamente de lo que salió mal"], a:1, ex:"Es el STAR aplicado a proyectos. Prepara 2: uno de equipo con socio formador (ATLAS) y uno personal de punta a punta (pakupaku o boxbuddy)." },
-  ]},
-];
+function addBank({ title, lang, topics, sourceHint }) {
+  const s = loadBanksStore();
+  const id = "b" + _hash(String(title) + Date.now());
+  const bank = {
+    id, title: String(title || "").trim() || "Banco", lang: lang === "en" ? "en" : "es",
+    createdAt: Date.now(), sourceHint: sourceHint || "job",
+    topics: topics.map((tp) => ({ id: id + "-" + tp.id, name: tp.name, color: tp.color, qs: tp.qs })),
+  };
+  s.banks.push(bank); s.activeId = id; saveBanksStore(s);
+  return bank;
+}
+function setActiveBank(id) { const s = loadBanksStore(); if (s.banks.some((b) => b.id === id)) { s.activeId = id; saveBanksStore(s); } }
+function deleteBank(id) {
+  const s = loadBanksStore();
+  s.banks = s.banks.filter((b) => b.id !== id);
+  if (s.activeId === id) s.activeId = s.banks.length ? s.banks[s.banks.length - 1].id : null;
+  saveBanksStore(s);
+}
+function buildTopicsFromActive() { const b = activeBank(); TOPICS = b ? b.topics : []; }
+function loadDemo() {
+  const src = DEMO_BANK[lang] || DEMO_BANK.es;
+  const b = addBank({ title: t("setup_load_demo"), lang, topics: src.topics, sourceHint: "demo" });
+  setActiveBank(b.id); buildTopicsFromActive();
+  toast(t("setup_demo_loaded")); renderHome(); show("s-home");
+}
+function showDemoOffer() {
+  const msg = $("#setupMsg");
+  const btn = document.createElement("button");
+  btn.className = "btn"; btn.style.marginTop = "10px";
+  btn.textContent = t("setup_load_demo");
+  btn.addEventListener("click", loadDemo);
+  msg.appendChild(document.createElement("br"));
+  msg.appendChild(btn);
+}
 
 /* ============================================================
    ESTADO
@@ -1039,6 +992,29 @@ function renderHud(){
 }
 
 function renderHome(){
+  buildTopicsFromActive();
+  if (!activeBank()) { show("s-setup"); renderSetup(); return; }
+
+  const ab = activeBank();
+  $("#bankTitle").textContent = ab.title;
+  const note = $("#bankLangNote");
+  if (ab.lang !== lang) {
+    note.style.display = "";
+    note.textContent = t("home_bank_lang_note", { lang: t("lang_" + ab.lang) });
+  } else { note.style.display = "none"; note.textContent = ""; }
+
+  const nb = $("#newBankBtn"); nb.textContent = t("home_new_interview");
+  nb.onclick = () => { show("s-setup"); renderSetup(); };
+
+  const sw = $("#bankSwitch");
+  const list = banksList();
+  if (list.length > 1) {
+    sw.style.display = "";
+    sw.innerHTML = "";
+    list.forEach((b) => { const o = document.createElement("option"); o.value = b.id; o.textContent = b.title; if (b.id === ab.id) o.selected = true; sw.appendChild(o); });
+    sw.onchange = () => { setActiveBank(sw.value); renderHome(); };
+  } else sw.style.display = "none";
+
   const grid = $("#topicGrid");
   grid.innerHTML = "";
   let totMastered = 0, totQ = 0;
@@ -1722,7 +1698,7 @@ function loadMammoth() {
 
 async function extractFileText(file) {
   const name = (file.name || "").toLowerCase();
-  if (name.endsWith(".txt") || name.endsWith(".md")) return (await file.text()).slice(0, 20000);
+  if (name.endsWith(".txt") || name.endsWith(".md")) return (await file.text()).slice(0, 15000);
   if (name.endsWith(".pdf")) {
     const pdfjs = await loadPdfLib();
     const buf = await file.arrayBuffer();
@@ -1760,7 +1736,7 @@ function updateGenEnabled() {
 function bindSetupOnce() {
   if (bindSetupOnce._done) return; bindSetupOnce._done = true;
   $("#jobInput").addEventListener("input", updateGenEnabled);
-  const file = $("#cvFile"), drop = $("#cvDrop"), msg = $("#cvFileMsg");
+  const file = $("#cvFile"), drop = $("#cvDrop");
   drop.addEventListener("click", () => file.click());
   drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
   drop.addEventListener("dragleave", () => drop.classList.remove("over"));
@@ -1777,7 +1753,11 @@ async function handleCvFile(f) {
     $("#cvInput").value = cur ? cur + "\n\n" + text : text;
     msg.textContent = t("setup_cv_parsed", { file: f.name });
   } catch (e) {
-    if (String(e.message).includes("load failed") || e.name === "TypeError") { fileSupport = false; $("#cvDrop").style.display = "none"; msg.textContent = t("setup_cv_nofile"); }
+    // Only disable file support when the vendor lib itself failed to load
+    // (dynamic import / <script> injection). A parse error on a supported
+    // file is just a bad file — keep the drop zone.
+    const em = String((e && e.message) || "");
+    if (/import|fetch|load/i.test(em)) { fileSupport = false; $("#cvDrop").style.display = "none"; msg.textContent = t("setup_cv_nofile"); }
     else msg.textContent = t("setup_cv_parsefail");
   }
 }
@@ -1789,7 +1769,7 @@ async function runGeneration() {
   const btn = $("#genBtn"), msg = $("#setupMsg");
   msg.className = "setup-msg"; msg.textContent = "";
 
-  // TODO(task-8/9): remove guards once bank store + quota land
+  // TODO(task-9): remove guard once gen quota lands
   const cap = (typeof checkGenQuota === "function") ? checkGenQuota() : { ok: true };
   if (!cap.ok) { msg.className = "setup-msg err"; msg.textContent = t("setup_limit_reached", { n: cap.limit }); return; }
 
@@ -1816,29 +1796,25 @@ async function runGeneration() {
       const detail = j.detail || j.error || ("HTTP " + r.status);
       throw new Error(detail);
     }
-    if (typeof bumpGenQuota === "function") bumpGenQuota();          // Task 9
-    // TODO(task-8/9): remove guards once bank store + quota land
-    if (typeof addBank !== "function") { console.warn("addBank not yet available"); return; }
-    const bank = addBank({                                          // Task 8
+    if (typeof bumpGenQuota === "function") bumpGenQuota();          // TODO(task-9): remove guard once gen quota lands
+    const bank = addBank({
       title: payload.jobDescription.slice(0, 48),
       lang: payload.language,
       topics: j.topics,
       sourceHint: payload.githubUser ? "github:" + payload.githubUser : "job",
     });
-    setActiveBank(bank.id);                                         // Task 8
-    buildTopicsFromActive();                                        // Task 8
+    setActiveBank(bank.id);
+    buildTopicsFromActive();
     renderHome(); show("s-home");
   } catch (e) {
     msg.className = "setup-msg err";
     msg.textContent = t("setup_error", { detail: String(e.message).slice(0, 200) });
-    if (typeof banksList === "function" && !banksList().length && typeof showDemoOffer === "function") showDemoOffer();  // Task 8
+    if (!banksList().length) showDemoOffer();
   } finally {
     clearInterval(genStatusTimer);
     btn.disabled = false; btn.textContent = orig;
   }
 }
-
-window.__setup = () => { renderSetup(); bindSetupOnce(); show("s-setup"); };  // TODO(task-8): remove
 
 /* ============================================================
    EVENTOS
@@ -1874,5 +1850,7 @@ $("#fcCard").addEventListener("click", ()=>{ if(fc && !fc.flipped) flipFc(); });
    ============================================================ */
 applyI18n();
 renderHud();
-renderHome();
+bindSetupOnce();
+if (activeBank()) { buildTopicsFromActive(); renderHome(); show("s-home"); }
+else { renderSetup(); show("s-setup"); }
 </script>

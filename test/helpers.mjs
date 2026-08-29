@@ -54,7 +54,7 @@ export function extractClientHelpers(names, sandbox = {}) {
     createElement() { return domStub; },
   };
   const ctx = {
-    window: {}, document,
+    window: { scrollTo() {} }, document,
     navigator: { language: "es-MX" }, localStorage: fakeLocalStorage(),
     console, structuredClone, setTimeout, clearTimeout, fetch: undefined,
     ...sandbox,
