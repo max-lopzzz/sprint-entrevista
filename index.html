@@ -374,6 +374,7 @@
       </div>
       <div class="bank-bar-actions">
         <select id="bankSwitch" style="display:none"></select>
+        <button class="btn ghost" id="deleteBankBtn" title=""></button>
         <button class="btn ghost" id="newBankBtn"></button>
       </div>
     </div>
@@ -533,6 +534,9 @@ const STR = {
     home_hero_title: "Practica para tu entrevista",
     home_hero_sub: "Tu banco de preguntas, generado a partir de la vacante y tu perfil. Responde, gana XP, sube de nivel.",
     home_new_interview: "Nueva entrevista",
+    home_delete_bank: "Borrar este banco",
+    bank_delete_confirm: "¿Borrar el banco \"{title}\"? Esta acción no se puede deshacer.",
+    bank_delete_done: "Banco borrado",
     home_switch_bank: "Cambiar banco",
     home_bank_lang_note: "Este banco está en {lang}.",
     home_mastery: "Dominio por tema",
@@ -658,6 +662,9 @@ const STR = {
     home_hero_title: "Practice for your interview",
     home_hero_sub: "Your question bank, generated from the job description and your profile. Answer, earn XP, level up.",
     home_new_interview: "New interview",
+    home_delete_bank: "Delete this bank",
+    bank_delete_confirm: "Delete the bank \"{title}\"? This can't be undone.",
+    bank_delete_done: "Bank deleted",
     home_switch_bank: "Switch bank",
     home_bank_lang_note: "This bank is in {lang}.",
     home_mastery: "Mastery by topic",
@@ -881,7 +888,7 @@ function deleteBank(id) {
   if (s.activeId === id) s.activeId = s.banks.length ? s.banks[s.banks.length - 1].id : null;
   saveBanksStore(s);
 }
-function buildTopicsFromActive() { const b = activeBank(); TOPICS = b ? b.topics : []; }
+function buildTopicsFromActive() { const b = activeBank(); TOPICS = (b && Array.isArray(b.topics)) ? b.topics : []; }
 function loadDemo() {
   const src = DEMO_BANK[lang] || DEMO_BANK.es;
   const b = addBank({ title: t("setup_load_demo"), lang, topics: src.topics, sourceHint: "demo" });
@@ -1013,6 +1020,15 @@ function renderHome(){
 
   const nb = $("#newBankBtn"); nb.textContent = t("home_new_interview");
   nb.onclick = () => { show("s-setup"); renderSetup(); };
+
+  const db = $("#deleteBankBtn");
+  db.textContent = "🗑"; db.title = t("home_delete_bank");
+  db.onclick = () => {
+    if (!confirm(t("bank_delete_confirm", { title: ab.title }))) return;
+    deleteBank(ab.id);
+    toast(t("bank_delete_done"));
+    renderHome();
+  };
 
   const sw = $("#bankSwitch");
   const list = banksList();
@@ -1644,8 +1660,7 @@ function advanceOpen(){
   renderOpen();
 }
 
-function fallbackReveal(code, detail){
-  const it = oa.items[oa.idx];
+function errMsgFor(code){
   const msgs = {
     no_key: t("err_no_key"),
     bad_key: t("err_bad_key"),
@@ -1660,8 +1675,13 @@ function fallbackReveal(code, detail){
     empty_reply: t("err_empty_reply"),
     bad_reply: t("err_bad_reply")
   };
+  return msgs[code] || t("err_generic", { code });
+}
+
+function fallbackReveal(code, detail){
+  const it = oa.items[oa.idx];
   const teach = oa.kind === "teach";
-  addBubble("sys", (msgs[code] || t("err_generic", { code })) + " " + (teach
+  addBubble("sys", errMsgFor(code) + " " + (teach
     ? t("oa_reveal_self_teach")
     : t("oa_reveal_self")));
   if(detail) addBubble("sys", t("provider_detail", { detail: esc(String(detail).slice(0,240)) }));
@@ -1820,12 +1840,19 @@ async function runGeneration() {
   msg.textContent = t("setup_gen_status_1");
   genStatusTimer = setInterval(() => { step = step % 4 + 1; msg.textContent = t("setup_gen_status_" + step); }, 2500);
 
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), 55000);
   try {
-    const r = await fetch(GEN_ENDPOINT(), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const r = await fetch(GEN_ENDPOINT(), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), signal: ctrl.signal });
+    clearTimeout(to);
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !Array.isArray(j.topics)) {
-      const detail = j.detail || j.error || ("HTTP " + r.status);
-      throw new Error(detail);
+      const code = j.error || ("http_" + r.status);
+      const detail = j.detail;
+      msg.className = "setup-msg err";
+      msg.textContent = errMsgFor(code) + (detail ? " " + t("provider_detail", { detail: esc(String(detail).slice(0, 200)) }) : "");
+      if (!banksList().length) showDemoOffer();
+      return;
     }
     bumpGenQuota();
     const bank = addBank({
@@ -1838,8 +1865,9 @@ async function runGeneration() {
     buildTopicsFromActive();
     renderHome(); show("s-home");
   } catch (e) {
+    clearTimeout(to);
     msg.className = "setup-msg err";
-    msg.textContent = t("setup_error", { detail: String(e.message).slice(0, 200) });
+    msg.textContent = errMsgFor(e.name === "AbortError" ? "timeout" : "network");
     if (!banksList().length) showDemoOffer();
   } finally {
     clearInterval(genStatusTimer);
@@ -1882,6 +1910,12 @@ $("#fcCard").addEventListener("click", ()=>{ if(fc && !fc.flipped) flipFc(); });
 applyI18n();
 renderHud();
 bindSetupOnce();
-if (activeBank()) { buildTopicsFromActive(); renderHome(); show("s-home"); }
-else { renderSetup(); show("s-setup"); }
+try {
+  if (activeBank()) { buildTopicsFromActive(); renderHome(); show("s-home"); }
+  else { renderSetup(); show("s-setup"); }
+} catch (e) {
+  // A malformed/corrupted "sprint-banks" entry must never hard-block the app.
+  try { localStorage.removeItem("sprint-banks"); } catch (_) {}
+  renderSetup(); show("s-setup");
+}
 </script>
