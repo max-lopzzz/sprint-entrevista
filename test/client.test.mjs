@@ -17,6 +17,13 @@ test("STR: es and en have identical key sets", () => {
   assert.deepEqual(es, en);
 });
 
+test("esc(): escapes HTML-significant characters (defence against LLM-controlled topic names)", () => {
+  const { esc } = extractClientHelpers(["esc"]);
+  assert.equal(esc("<img src=x onerror=alert(1)>"), "&lt;img src=x onerror=alert(1)&gt;");
+  assert.equal(esc("Tom & Jerry"), "Tom &amp; Jerry");
+  assert.equal(esc("SQL"), "SQL");
+});
+
 test("banks store: add prefixes topic ids and persists; delete removes", () => {
   const api = extractClientHelpers(
     ["loadBanksStore","saveBanksStore","addBank","setActiveBank","deleteBank","activeBank","banksList","buildTopicsFromActive"],

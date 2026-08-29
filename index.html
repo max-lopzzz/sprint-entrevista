@@ -1052,7 +1052,7 @@ function renderHome(){
     b.style.setProperty("--tc", t.color);
     b.innerHTML = `
       <div class="t-top">
-        <span class="t-name">${t.name}</span>
+        <span class="t-name">${esc(t.name)}</span>
         <span class="t-count">${Math.min(m,n)}/${n}</span>
       </div>
       <div class="bar"><i style="width:${pct}%"></i></div>`;
@@ -1424,7 +1424,7 @@ function showResult(cfg){
       const row = document.createElement("div");
       row.className = "brow";
       row.innerHTML = `
-        <span class="bn">${r.name}</span>
+        <span class="bn">${esc(r.name)}</span>
         <span class="bbar" style="--tc:${r.color}"><i style="width:${r.pct}%"></i></span>
         <span class="bv">${r.c}/${r.n}</span>`;
       bd.appendChild(row);
