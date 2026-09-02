@@ -24,9 +24,12 @@ Interfaz en español e inglés (botón ES/EN). Cada banco queda en el idioma en 
 
 ## Uso local
 
-Abre `index.html` en el navegador. No necesita servidor.
+Abrir `index.html` directamente (doble clic, GitHub Pages, Artifact) muestra la pantalla de
+configuración, pero **generar preguntas necesita un backend**: pega la URL de un deploy en
+**⚙︎ IA**, o usa el botón **«Cargar ejemplo»** que aparece si la generación falla.
 (Con conexión carga tipografías de Google Fonts; sin ella usa fuentes de respaldo.)
-Para probar la generación de bancos y los modos con IA en local hay un servidor incluido:
+
+Para desarrollo local hay un servidor incluido que ya trae los dos endpoints:
 
 ```
 LLM_API_KEY=tu_key_de_groq node dev-server.mjs   # http://localhost:4600
@@ -63,9 +66,9 @@ cualquier copia de la página puede usar el backend desplegado: abre la app, pul
 y pega la URL de tu deploy (p. ej. `https://sprint-entrevista.vercel.app`). Se guarda en
 `localStorage`. Sin eso, la página usa `/api/generate` y `/api/grade` del mismo origen.
 
-Alternativamente, pega tu propia API key en **⚙︎ IA** para usar la app sin necesidad de
-backend desplegado; las llamadas van directo al proveedor de IA y el navegador sin pasar
-por un servidor.
+Tu propia API key en **⚙︎ IA** sustituye a la key del servidor, pero las peticiones siguen
+pasando por una función `/api/*` — no hay una ruta navegador → proveedor directa. Es decir:
+aun con tu key necesitas la URL de un deploy en **⚙︎ IA** (o abrir la versión de Vercel).
 
 Nota: si usas un backend compartido, el proxy usa tu key; una URL pública deja que otros
 consuman tu cuota (gratuita y con límites en Groq). Para uso personal es aceptable; si hace

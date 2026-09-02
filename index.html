@@ -479,7 +479,7 @@
         <label class="ai-cfg-label" data-i18n="oa_cfg_key_label" for="oaKeyInput"></label>
         <input id="oaKeyInput" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…">
         <button class="btn" id="oaCfgSave" data-i18n="oa_cfg_save">Guardar</button>
-        <span class="hint">Se guarda solo en este navegador. Si lo dejas vacío, se usa <code>/api/grade</code> del mismo sitio.</span>
+        <span class="hint" data-i18n="oa_cfg_hint"></span>
       </div>
       <div class="oa-q" id="oaQ"></div>
       <div id="oaCodeWrap"></div>
@@ -568,6 +568,7 @@ const STR = {
     oa_cfg_url_label: "URL de tu backend (deploy en Vercel) — para usar la IA fuera de esa URL",
     oa_cfg_key_label: "API key propia (opcional) — se guarda solo en este navegador",
     oa_cfg_save: "Guardar", oa_cfg_saved: "Guardado", oa_cfg_cleared: "Borrado",
+    oa_cfg_hint: "Se guarda solo en este navegador. Si lo dejas vacío se usa el mismo origen para /api/generate y /api/grade.",
     oa_teach_intro: "Explica el concepto con tus palabras, como si dieras clase. La IA hará de alumno: te preguntará si algo no queda claro y al final evaluará tu explicación.",
     verdict_correcto: "CORRECTO", verdict_parcial: "PARCIAL", verdict_incorrecto: "INCORRECTO",
     ref_answer: "Respuesta correcta:", ref_reference: "Referencia:",
@@ -630,7 +631,7 @@ const STR = {
     setup_job_label: "Descripción del empleo",
     setup_job_ph: "Pega aquí la vacante: responsabilidades, requisitos, tecnologías…",
     setup_cv_label: "CV (opcional)",
-    setup_cv_ph: "Pega el texto de tu CV, o suelta un archivo .pdf / .docx / .txt aquí.",
+    setup_cv_ph: "Pega el texto de tu CV, o suelta un archivo .pdf / .docx / .txt aquí. El texto extraído se envía a la IA para generar el banco; no se guarda.",
     setup_cv_drop: "Soltar archivo o hacer clic",
     setup_cv_parsing: "Leyendo archivo…",
     setup_cv_parsed: "Texto extraído de {file} — revísalo y edítalo si hace falta.",
@@ -691,6 +692,7 @@ const STR = {
     oa_cfg_url_label: "Your backend URL (Vercel deploy) — to use the AI outside that URL",
     oa_cfg_key_label: "Your own API key (optional) — stored only in this browser",
     oa_cfg_save: "Save", oa_cfg_saved: "Saved", oa_cfg_cleared: "Cleared",
+    oa_cfg_hint: "Stored only in this browser. If left empty, the same origin is used for /api/generate and /api/grade.",
     oa_teach_intro: "Explain the concept in your own words, as if teaching a class. The AI will play student: it asks when something is unclear and evaluates your explanation at the end.",
     verdict_correcto: "CORRECT", verdict_parcial: "PARTIAL", verdict_incorrecto: "INCORRECT",
     ref_answer: "Correct answer:", ref_reference: "Reference:",
@@ -750,7 +752,7 @@ const STR = {
     setup_job_label: "Job description",
     setup_job_ph: "Paste the posting: responsibilities, requirements, technologies…",
     setup_cv_label: "CV (optional)",
-    setup_cv_ph: "Paste your CV text, or drop a .pdf / .docx / .txt file here.",
+    setup_cv_ph: "Paste your CV text, or drop a .pdf / .docx / .txt file here. The extracted text is sent to the AI to build the bank; it is not stored.",
     setup_cv_drop: "Drop a file or click",
     setup_cv_parsing: "Reading file…",
     setup_cv_parsed: "Text extracted from {file} — review and edit if needed.",
@@ -1539,7 +1541,7 @@ function bindOpenOnce(){
     const k = $("#oaKeyInput").value.trim();
     try{ if(k) localStorage.setItem("sprint-user-key", k); else localStorage.removeItem("sprint-user-key"); }catch(e){}
     $("#oaCfg").classList.remove("show");
-    toast(v ? t("oa_cfg_saved") : t("oa_cfg_cleared"));
+    toast((v || k) ? t("oa_cfg_saved") : t("oa_cfg_cleared"));
   });
 }
 
@@ -1779,6 +1781,12 @@ function renderSetup() {
   applyI18n();
   const drop = $("#cvDrop");
   if (drop) drop.style.display = fileSupport ? "" : "none";
+  const sm = $("#setupMsg");
+  // Opened as a bare file:// with no configured backend -> generation can't work.
+  if (sm && !sm.textContent && !aiBase() && location.protocol === "file:") {
+    sm.className = "setup-msg";
+    sm.textContent = t("setup_need_backend");
+  }
   updateGenEnabled();
 }
 function updateGenEnabled() {

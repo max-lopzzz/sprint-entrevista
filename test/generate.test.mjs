@@ -126,6 +126,31 @@ test("generate: too few valid questions on both attempts -> 502 bad_json", async
   globalThis.fetch = orig;
 });
 
+test("generate: long projectsText does not crowd out the GitHub summary", async () => {
+  process.env.LLM_API_KEY = "k";
+  const orig = globalThis.fetch;
+  const bigProjects = "PROYECTOX ".repeat(600); // ~6000 chars, well over the 3000 half-budget
+  const repoLine = "SENTINEL_REPO_TOKEN";
+  let sentBody = "";
+  globalThis.fetch = async (url, init) => {
+    const u = String(url);
+    if (u.includes("api.github.com") && u.includes("/repos?")) {
+      return new Response(JSON.stringify([{ name: repoLine, language: "Python", fork: false, description: "d", topics: [] }]), { status: 200 });
+    }
+    if (u.includes("api.github.com") && u.includes("/readme")) return new Response("", { status: 404 });
+    if (u.includes("chat/completions")) {
+      sentBody = init.body;
+      return new Response(JSON.stringify({ choices: [{ message: { content: okQuestions } }] }), { status: 200 });
+    }
+    throw new Error("unexpected url " + u);
+  };
+  const res = resShim();
+  await handler({ method: "POST", body: JSON.stringify({ jobDescription: "Analista", language: "es", githubUser: "octocat", projectsText: bigProjects }) }, res);
+  assert.equal(res.statusCode, 200);
+  assert.match(sentBody, /SENTINEL_REPO_TOKEN/); // GitHub summary survived alongside the long projectsText
+  globalThis.fetch = orig;
+});
+
 test("generate: github 403 sets meta.githubSkipped and still succeeds", async () => {
   process.env.LLM_API_KEY = "k";
   const orig = globalThis.fetch;

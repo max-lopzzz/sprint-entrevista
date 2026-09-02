@@ -5,7 +5,11 @@
 import { resolveProvider, callChat, NoKeyError } from "./_llm.js";
 import { validateQuestions, clampCount } from "./_bank.js";
 
-const LIMITS = { job: 8000, cv: 15000, projects: 6000, github: 6000 };
+// `projects` is the combined budget passed to the model. The user's free-text
+// projects and the GitHub summary each get half, so the join below never
+// overflows `projects` and buildMessages' clip is a no-op (nothing silently
+// dropped — the bug this split fixes).
+const LIMITS = { job: 8000, cv: 15000, projects: 6000, projectsText: 3000, github: 3000 };
 const GH_USER_RE = /^[A-Za-z0-9-]{1,39}$/;
 
 function clip(s, n) { return (typeof s === "string" ? s : "").slice(0, n); }
@@ -103,11 +107,15 @@ export default async function handler(req, res) {
   catch (e) { if (e instanceof NoKeyError) return res.status(503).json({ error: "no_key" }); throw e; }
 
   let githubSkipped;
-  let projectsSummary = clip(b.projectsText, LIMITS.projects);
+  let projectsSummary = clip(b.projectsText, LIMITS.projectsText);
   if (b.githubUser) {
     const gh = await fetchGithubSummary(String(b.githubUser).trim());
     if (gh.skipped) githubSkipped = gh.skipped;
-    if (gh.text) projectsSummary = clip(`${projectsSummary}\n\n${gh.text}`, LIMITS.projects + LIMITS.github);
+    if (gh.text) {
+      projectsSummary = projectsSummary
+        ? `${projectsSummary}\n\n${clip(gh.text, LIMITS.github)}`
+        : clip(gh.text, LIMITS.github);
+    }
   }
 
   const messages = buildMessages({ jobDescription: b.jobDescription, cv: b.cv, projectsSummary, language, count });
