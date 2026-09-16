@@ -1,5 +1,7 @@
 # Sprint de Entrevista
 
+**Demo en vivo: [sprint-entrevista.vercel.app](https://sprint-entrevista.vercel.app/)**
+
 Plataforma para generar bancos de preguntas de entrevista personalizados a partir de una
 descripción de empleo. Página estática (`index.html`, sin build) + dos funciones serverless
 opcionales (`api/generate.js`, `api/grade.js`) para la generación y evaluación con IA.
